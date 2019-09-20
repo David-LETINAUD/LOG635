@@ -14,7 +14,7 @@ from cube_stack import *
 custom_object = None
 
 # list FIFO
-ID_path = [2,3,4,5,6,7,8,9,10,11,12,13,14,15]
+ID_path = [4,5,6,7,8,9,10,11,12,13,14,15]
 Function_path = [alarm_clock,reveil]
 
 # object found
@@ -62,23 +62,30 @@ def custom_objects(robot: cozmo.robot.Robot):
     ### 1st step
     #cozmo.run_program(cube_stack, use_3d_viewer=True, use_viewer=True)
     # A TESTER !!! /!\
+    
     while len(ID_path)!=0 :
+        print("WHILE")
         marker = []
         marker_id = []
         pose_tab = []
 
         lookaround = robot.start_behavior(cozmo.behavior.BehaviorTypes.LookAroundInPlace)
-        marker = robot.world.wait_until_observe_num_objects(num=3, object_type=CustomObject, timeout=60)
+        print("look_end")
+
+        marker = robot.world.wait_until_observe_num_objects(num=2, object_type=CustomObject, timeout=60)
+        print("marker_end")
         #marker = robot.world.wait_until_observe_num_objects(num=2, object_type=cozmo.objects.LightCube, timeout=60)
         lookaround.stop()
 
         print(marker)
         
         for m in marker:
-            marker_id.append(m.cube_id)#get_id())
+            print("ID")
+            marker_id.append(m)#.cube_id)#get_id())
             pose_tab.append(Pose(m.pose.position.x - 90, m.pose.position.y - 0, 0, angle_z= degrees(0)))
 
         if ID_path[0] in marker_id:
+            print("FIND")
             # /!\ selectionner la pose de ID_path[0]
             #print(marker.index(ID_path[0]))
             # ind = marker.index(ID_path[0])

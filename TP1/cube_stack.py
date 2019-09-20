@@ -31,4 +31,4 @@ def cube_stack(robot: cozmo.robot.Robot):
 
         print("Cozmo successfully stacked 2 blocks!")
 
-cozmo.run_program(cube_stack, use_3d_viewer=True, use_viewer=True)
+#cozmo.run_program(cube_stack, use_3d_viewer=True, use_viewer=True)

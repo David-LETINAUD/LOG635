@@ -8,19 +8,28 @@ from cozmo.util import Pose,degrees,distance_mm
 
 from camera import *
 from alarm import *
+from reveil import *
 from cube_stack import *
 
 custom_object = None
+
+# list FIFO
+ID_path = [2,3,4,5,6,7,8,9,10,11,12,13,14,15]
+Function_path = [alarm_clock,reveil]
+
+# object found
+object_found = [] 
 
 def handle_object_appeared(evt, **kw):   
     # Cela sera appelé chaque fois qu'un EvtObjectAppeared est déclanché
     # chaque fois qu'un objet entre en vue
     if isinstance(evt.obj, CustomObject):
-        print()
-        print()
-        print()
-        print()
         print(f"Cozmo started seeing a {str(evt.obj.object_type)}")
+        #object_found.append(evt.obj.get_id())
+        #if ID_path[0] in res:
+            # go to pose #aller à la position de ID_path[0]
+            #ID_path.pop(0) # POP le 1er élément
+            #print(ID_path)
 
 def handle_object_disappeared(evt, **kw):
     # Cela sera appelé lorsqu'un EvtObjectDisappeared est declanché    
@@ -42,25 +51,48 @@ def custom_objects(robot: cozmo.robot.Robot):
                                                  CustomObjectMarkers.Circles3,
                                                  60, 24.19, 24.19, True) 
                   ]
-    
+                  
     #print(path_object)
     if (path_object is not None):# and  path_object[1] is not None):
         print("All objects defined successfully!")
     else:
         print("One or more object definitions failed!")
         return
-    
 
-    ###
+    ### 1st step
     #cozmo.run_program(cube_stack, use_3d_viewer=True, use_viewer=True)
+    # A TESTER !!! /!\
+    while len(ID_path)!=0 :
+        marker = []
+        marker_id = []
+        pose_tab = []
 
-    
+        lookaround = robot.start_behavior(cozmo.behavior.BehaviorTypes.LookAroundInPlace)
+        marker = robot.world.wait_until_observe_num_objects(num=3, object_type=CustomObject, timeout=60)
+        #marker = robot.world.wait_until_observe_num_objects(num=2, object_type=cozmo.objects.LightCube, timeout=60)
+        lookaround.stop()
 
-    lookaround1 = robot.start_behavior(cozmo.behavior.BehaviorTypes.LookAroundInPlace)
-    cubes = robot.world.wait_until_observe_num_objects(num=2, object_type=cozmo.objects.LightCube, timeout=60)
-    marker = robot.world.wait_until_observe_num_objects(num=len(path_object), object_type=CustomObject, timeout=120)
-    lookaround1.stop()
+        print(marker)
+        
+        for m in marker:
+            marker_id.append(m.cube_id)#get_id())
+            pose_tab.append(Pose(m.pose.position.x - 90, m.pose.position.y - 0, 0, angle_z= degrees(0)))
 
+        if ID_path[0] in marker_id:
+            # /!\ selectionner la pose de ID_path[0]
+            #print(marker.index(ID_path[0]))
+            # ind = marker.index(ID_path[0])
+            robot.go_to_pose(ind, relative_to_robot=False).wait_for_completed()
+            robot.add_event_handler(cozmo.world.EvtNewCameraImage, on_new_camera_image)        
+            take_photo(robot)
+            print("picture ok")
+            # Ce bloc ici (apres picture ok)
+            cozmo.run_program(Function_path[0]) # faire l'action associée
+            print("function ok")
+            ID_path.pop(0) # POP le 1er élément
+            Function_path.pop(0) 
+            print(ID_path)
+        
 
     if len(marker) > len(path_object)-1:
         print("Found object")
@@ -96,5 +128,5 @@ directory = f"{strftime('%y%m%d')}"
 if not os.path.exists('photos'):
     os.makedirs('photos')
 
-cozmo.run_program(alarm_clock)
+#cozmo.run_program(alarm_clock)
 cozmo.run_program(custom_objects, use_3d_viewer=True, use_viewer=True, force_viewer_on_top=True)

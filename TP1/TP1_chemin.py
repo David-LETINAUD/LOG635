@@ -8,6 +8,7 @@ from cozmo.util import Pose,degrees,distance_mm
 
 from camera import *
 from alarm import *
+from cube_stack import *
 
 custom_object = None
 
@@ -15,6 +16,10 @@ def handle_object_appeared(evt, **kw):
     # Cela sera appelé chaque fois qu'un EvtObjectAppeared est déclanché
     # chaque fois qu'un objet entre en vue
     if isinstance(evt.obj, CustomObject):
+        print()
+        print()
+        print()
+        print()
         print(f"Cozmo started seeing a {str(evt.obj.object_type)}")
 
 def handle_object_disappeared(evt, **kw):
@@ -28,6 +33,7 @@ def custom_objects(robot: cozmo.robot.Robot):
     # vois ou arrète de voir un objet
     robot.add_event_handler(cozmo.objects.EvtObjectAppeared, handle_object_appeared)
     robot.add_event_handler(cozmo.objects.EvtObjectDisappeared, handle_object_disappeared)
+
 
     path_object = [robot.world.define_custom_cube(CustomObjectTypes.CustomType00,
                                                  CustomObjectMarkers.Circles2,
@@ -43,39 +49,15 @@ def custom_objects(robot: cozmo.robot.Robot):
     else:
         print("One or more object definitions failed!")
         return
-
-    print("Press CTRL-C to quit")
-    
     
 
-    lookaround = robot.start_behavior(cozmo.behavior.BehaviorTypes.LookAroundInPlace)
-    cubes = robot.world.wait_until_observe_num_objects(num=2, object_type=cozmo.objects.LightCube, timeout=60)
-    lookaround.stop()
+    ###
+    #cozmo.run_program(cube_stack, use_3d_viewer=True, use_viewer=True)
 
-    if len(cubes) < 2:
-        print("Error: need 2 Cubes but only found", len(cubes), "Cube(s)")
-    else:
-        # Try and pickup the 1st cube
-        current_action = robot.pickup_object(cubes[0], num_retries=3)
-        current_action.wait_for_completed()
-        if current_action.has_failed:
-            code, reason = current_action.failure_reason
-            result = current_action.result
-            print("Pickup Cube failed: code=%s reason='%s' result=%s" % (code, reason, result))
-            return
-
-        # Now try to place that cube on the 2nd one
-        current_action = robot.place_on_object(cubes[1], num_retries=3)
-        current_action.wait_for_completed()
-        if current_action.has_failed:
-            code, reason = current_action.failure_reason
-            result = current_action.result
-            print("Place On Cube failed: code=%s reason='%s' result=%s" % (code, reason, result))
-            return
-
-        print("Cozmo successfully stacked 2 blocks!")
+    
 
     lookaround1 = robot.start_behavior(cozmo.behavior.BehaviorTypes.LookAroundInPlace)
+    cubes = robot.world.wait_until_observe_num_objects(num=2, object_type=cozmo.objects.LightCube, timeout=60)
     marker = robot.world.wait_until_observe_num_objects(num=len(path_object), object_type=CustomObject, timeout=120)
     lookaround1.stop()
 

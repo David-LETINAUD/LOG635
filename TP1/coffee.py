@@ -5,4 +5,4 @@ def coffee(robot: cozmo.robot.Robot):
 
 
 
-cozmo.run_program(coffee)
+#cozmo.run_program(coffee)

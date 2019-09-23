@@ -6,6 +6,7 @@ import cozmo
 from cozmo.objects import CustomObject, CustomObjectMarkers, CustomObjectTypes, ObservableElement, ObservableObject
 from cozmo.util import Pose,degrees,distance_mm
 
+from coffee import *
 from camera import *
 from alarm import *
 from reveil import reveil
@@ -15,7 +16,7 @@ custom_object = None
 
 # list FIFO
 ID_path = [4,5,6,7,8,9,10,11,12,13,14,15]
-Function_path = [reveil, alarm_clock]
+Function_path = [coffee, reveil, alarm_clock]
 
 # object found
 object_found = [] 
@@ -43,6 +44,7 @@ def custom_objects(robot: cozmo.robot.Robot):
     robot.add_event_handler(cozmo.objects.EvtObjectAppeared, handle_object_appeared)
     robot.add_event_handler(cozmo.objects.EvtObjectDisappeared, handle_object_disappeared)
 
+    Function_path[0](robot)
 
     path_object = [robot.world.define_custom_cube(CustomObjectTypes.CustomType00,
                                                  CustomObjectMarkers.Circles2,
@@ -93,11 +95,13 @@ def custom_objects(robot: cozmo.robot.Robot):
             cible = marker_id.index(ID_path[0])
             print(cible)
             robot.go_to_pose(pose_tab[cible], relative_to_robot=False).wait_for_completed()
-            robot.add_event_handler(cozmo.world.EvtNewCameraImage, on_new_camera_image)        
-            take_photo(robot)
+            #robot.add_event_handler(cozmo.world.EvtNewCameraImage, on_new_camera_image)        
+            #take_photo(robot)
             print("picture ok")
             # Ce bloc ici (apres picture ok)
-            cozmo.run_program(reveil) # faire l'action associée
+            #cozmo.run_program(coffee) # faire l'action associée
+            #coffee(robot)
+            Function_path[0](robot)
             print("function ok")
             ID_path.pop(0) # POP le 1er élément
             Function_path.pop(0) 

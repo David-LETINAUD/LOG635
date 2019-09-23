@@ -8,14 +8,14 @@ from cozmo.util import Pose,degrees,distance_mm
 
 from camera import *
 from alarm import *
-from reveil import *
+from reveil import reveil
 from cube_stack import *
 
 custom_object = None
 
 # list FIFO
 ID_path = [4,5,6,7,8,9,10,11,12,13,14,15]
-Function_path = [alarm_clock,reveil]
+Function_path = [reveil, alarm_clock]
 
 # object found
 object_found = [] 
@@ -77,24 +77,27 @@ def custom_objects(robot: cozmo.robot.Robot):
         #marker = robot.world.wait_until_observe_num_objects(num=2, object_type=cozmo.objects.LightCube, timeout=60)
         lookaround.stop()
 
-        print(marker)
+        #print(marker)
         
         for m in marker:
             print("ID")
-            marker_id.append(m)#.cube_id)#get_id())
+            print(m.object_id)
+            marker_id.append(m.object_id)#.cube_id)#get_id())
             pose_tab.append(Pose(m.pose.position.x - 90, m.pose.position.y - 0, 0, angle_z= degrees(0)))
 
         if ID_path[0] in marker_id:
             print("FIND")
             # /!\ selectionner la pose de ID_path[0]
             #print(marker.index(ID_path[0]))
-            # ind = marker.index(ID_path[0])
-            robot.go_to_pose(ind, relative_to_robot=False).wait_for_completed()
+            print(marker_id , ID_path[0])
+            cible = marker_id.index(ID_path[0])
+            print(cible)
+            robot.go_to_pose(pose_tab[cible], relative_to_robot=False).wait_for_completed()
             robot.add_event_handler(cozmo.world.EvtNewCameraImage, on_new_camera_image)        
             take_photo(robot)
             print("picture ok")
             # Ce bloc ici (apres picture ok)
-            cozmo.run_program(Function_path[0]) # faire l'action associée
+            cozmo.run_program(reveil) # faire l'action associée
             print("function ok")
             ID_path.pop(0) # POP le 1er élément
             Function_path.pop(0) 

@@ -18,6 +18,8 @@ custom_object = None
 ID_path = [4,5,6,7,8,9,10,11,12,13,14,15]
 Function_path = [coffee, reveil, alarm_clock]
 
+
+
 # object found
 object_found = [] 
 
@@ -44,17 +46,20 @@ def custom_objects(robot: cozmo.robot.Robot):
     robot.add_event_handler(cozmo.objects.EvtObjectAppeared, handle_object_appeared)
     robot.add_event_handler(cozmo.objects.EvtObjectDisappeared, handle_object_disappeared)
 
-    Function_path[0](robot)
 
-    path_object = [robot.world.define_custom_cube(CustomObjectTypes.CustomType00,
-                                                 CustomObjectMarkers.Circles2,
-                                                 60, 24.19, 24.19, True),
-                   robot.world.define_custom_cube(CustomObjectTypes.CustomType01,
-                                                 CustomObjectMarkers.Circles3,
-                                                 60, 24.19, 24.19, True) 
-                  ]
-                  
-    #print(path_object)
+    path_object = ['robot.world.define_custom_cube(CustomObjectTypes.CustomType00,CustomObjectMarkers.Circles2,60, 24.19, 24.19, True)',
+                   'robot.world.define_custom_cube(CustomObjectTypes.CustomType01,CustomObjectMarkers.Circles3,60, 24.19, 24.19, True)'
+    ]
+
+    #path_object.pop()         
+    #robot.world.undefine_all_custom_marker_objects()
+    for cust_cube in path_object:
+        eval(cust_cube)
+    
+
+    #for fnc in path_object:
+    #    fnc()
+
     if (path_object is not None):# and  path_object[1] is not None):
         print("All objects defined successfully!")
     else:
@@ -67,14 +72,16 @@ def custom_objects(robot: cozmo.robot.Robot):
     
     while len(ID_path)!=0 :
         print("WHILE")
+        num_cust_obj = 2
         marker = []
         marker_id = []
         pose_tab = []
 
+
         lookaround = robot.start_behavior(cozmo.behavior.BehaviorTypes.LookAroundInPlace)
         print("look_end")
 
-        marker = robot.world.wait_until_observe_num_objects(num=2, object_type=CustomObject, timeout=60)
+        marker = robot.world.wait_until_observe_num_objects(num=num_cust_obj, object_type=CustomObject, timeout=60)
         print("marker_end")
         #marker = robot.world.wait_until_observe_num_objects(num=2, object_type=cozmo.objects.LightCube, timeout=60)
         lookaround.stop()
@@ -84,28 +91,34 @@ def custom_objects(robot: cozmo.robot.Robot):
         for m in marker:
             print("ID")
             print(m.object_id)
-            marker_id.append(m.object_id)#.cube_id)#get_id())
+            marker_id.append(m.object_id)
             pose_tab.append(Pose(m.pose.position.x - 90, m.pose.position.y - 0, 0, angle_z= degrees(0)))
 
-        if ID_path[0] in marker_id:
-            print("FIND")
-            # /!\ selectionner la pose de ID_path[0]
-            #print(marker.index(ID_path[0]))
-            print(marker_id , ID_path[0])
-            cible = marker_id.index(ID_path[0])
-            print(cible)
-            robot.go_to_pose(pose_tab[cible], relative_to_robot=False).wait_for_completed()
-            #robot.add_event_handler(cozmo.world.EvtNewCameraImage, on_new_camera_image)        
-            #take_photo(robot)
-            print("picture ok")
-            # Ce bloc ici (apres picture ok)
-            #cozmo.run_program(coffee) # faire l'action associée
-            #coffee(robot)
-            Function_path[0](robot)
-            print("function ok")
-            ID_path.pop(0) # POP le 1er élément
-            Function_path.pop(0) 
-            print(ID_path)
+        for i in range(num_cust_obj):
+            if ID_path[0] in marker_id:
+                print("FIND")
+                # /!\ selectionner la pose de ID_path[0]
+                #print(marker.index(ID_path[0]))
+                print(marker_id , ID_path[0])
+                cible = marker_id.index(ID_path[0])
+                print(cible)
+                robot.go_to_pose(pose_tab[cible], relative_to_robot=False).wait_for_completed()
+                robot.add_event_handler(cozmo.world.EvtNewCameraImage, on_new_camera_image)        
+                take_photo(robot)
+                print("picture ok")
+                Function_path[0](robot)
+                print("function ok")
+                ID_path.pop(0) # POP le 1er élément
+                Function_path.pop(0) 
+                
+                path_object.pop(0) # ne pas redétecter les objets sur lequel on est déjà passé
+                robot.world.undefine_all_custom_marker_objects()
+                for cust_cube in path_object:
+                    eval(cust_cube)
+                    
+                print(ID_path)
+                print()
+                print()
         
 
     if len(marker) > len(path_object)-1:

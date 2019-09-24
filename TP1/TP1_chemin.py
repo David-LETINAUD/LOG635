@@ -11,6 +11,7 @@ from camera import *
 from alarm import *
 from reveil import *
 from cube_stack import *
+from cubes_unstack import *
 from nap import *
 from sing import *
 from mirror import *
@@ -19,7 +20,7 @@ custom_object = None
 
 # list FIFO
 ID_path = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]
-Function_path = [alarm_clock, reveil, coffee, sing, mirror, nap]
+Function_path = [alarm_clock, reveil, coffee,cube_stack, sing, mirror, nap, cube_unstack ]
 
 marker = []
 marker_id = []

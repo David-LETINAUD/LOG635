@@ -21,10 +21,15 @@ custom_object = None
 ID_path = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]
 Function_path = [alarm_clock, reveil, coffee, sing, mirror, nap]
 
-# object found
-#object_found = [] 
+marker = []
+marker_id = []
+pose_tab = []
 
 def handle_object_appeared(evt, **kw):   
+    global marker 
+    global marker_id
+    global pose_tab
+
     # Cela sera appelé chaque fois qu'un EvtObjectAppeared est déclanché
     # chaque fois qu'un objet entre en vue
     if isinstance(evt.obj, CustomObject):
@@ -32,10 +37,14 @@ def handle_object_appeared(evt, **kw):
         print(type_nb)
         print(f"Cozmo started seeing a {str(evt.obj.object_type) } " +  str(str(evt.obj.object_type).split('.')[1])[-2:] + " ID " + str(evt.obj.object_id)  )
         #object_found.append(evt.obj.get_id())
-        #if ID_path[0] in res:
-            # go to pose #aller à la position de ID_path[0]
-            #ID_path.pop(0) # POP le 1er élément
-            #print(ID_path)
+        if type_nb not in marker_id:
+            marker_id.append(type_nb)
+            pose_tab.append(Pose(evt.obj.pose.position.x - 90, evt.obj.pose.position.y - 0, 0, angle_z= degrees(0)))
+        else :
+            ind = marker_id.index(type_nb)
+            print("Position mise à jour")
+            # actualiser la position
+            pose_tab[ind] = Pose(evt.obj.pose.position.x - 90, evt.obj.pose.position.y - 0, 0, angle_z= degrees(0))
 
 def handle_object_disappeared(evt, **kw):
     # Cela sera appelé lorsqu'un EvtObjectDisappeared est declanché    
@@ -49,6 +58,9 @@ def custom_objects(robot: cozmo.robot.Robot):
     robot.add_event_handler(cozmo.objects.EvtObjectAppeared, handle_object_appeared)
     robot.add_event_handler(cozmo.objects.EvtObjectDisappeared, handle_object_disappeared)
 
+    global marker 
+    global marker_id
+    global pose_tab
 
     path_object = ['robot.world.define_custom_cube(CustomObjectTypes.CustomType00,CustomObjectMarkers.Circles2,60, 24.19, 24.19, True)',
                    'robot.world.define_custom_cube(CustomObjectTypes.CustomType01,CustomObjectMarkers.Circles3,60, 24.19, 24.19, True)',
@@ -83,54 +95,52 @@ def custom_objects(robot: cozmo.robot.Robot):
     
     while len(ID_path)!=0 :
         print("WHILE")
-        num_cust_obj = 4
-        marker = []
-        marker_id = []
-        pose_tab = []
+        num_cust_obj = 1
+        
 
 
         lookaround = robot.start_behavior(cozmo.behavior.BehaviorTypes.LookAroundInPlace)
         print("look_end")
 
-        marker = robot.world.wait_until_observe_num_objects(num=num_cust_obj, object_type=CustomObject, timeout=600)
+        marker = robot.world.wait_until_observe_num_objects(num=num_cust_obj, object_type=CustomObject, timeout=10)
         print("marker_end")
         #marker = robot.world.wait_until_observe_num_objects(num=2, object_type=cozmo.objects.LightCube, timeout=60)
         lookaround.stop()
 
         #print(marker)
         
-        for m in marker:
-            print("ID")
-            print(m.object_id)
-            type_nb = int(str(str(m.object_type).split('.')[1])[-2:])
-            print(type_nb)
-            #marker_id.append(m.object_id)
-            marker_id.append(type_nb)
-            pose_tab.append(Pose(m.pose.position.x - 90, m.pose.position.y - 0, 0, angle_z= degrees(0)))
+        # for m in marker:
+        #     print("ID")
+        #     print(m.object_id)
+        #     type_nb = int(str(str(m.object_type).split('.')[1])[-2:])
+        #     print(type_nb)
+        #     #marker_id.append(m.object_id)
+        #     marker_id.append(type_nb)
+        #     pose_tab.append(Pose(m.pose.position.x - 90, m.pose.position.y - 0, 0, angle_z= degrees(0)))
 
-        for i in range(num_cust_obj):
-            if ID_path[0] in marker_id:
-                print("FIND")
-                # /!\ selectionner la pose de ID_path[0]
-                #print(marker.index(ID_path[0]))
-                print(marker_id , ID_path[0])
-                cible = marker_id.index(ID_path[0])
-                print(cible)
-                robot.go_to_pose(pose_tab[cible], relative_to_robot=False).wait_for_completed()
-                robot.add_event_handler(cozmo.world.EvtNewCameraImage, on_new_camera_image)        
-                take_photo(robot)
-                print("picture ok")
-                Function_path[0](robot)
-                print("function ok")
-                ID_path.pop(0) # POP le 1er élément
-                Function_path.pop(0) 
+        
+        while ID_path[0] in marker_id:
+            print("FIND")
+            # /!\ selectionner la pose de ID_path[0]
+            #print(marker.index(ID_path[0]))
+            print(marker_id , ID_path[0])
+            cible = marker_id.index(ID_path[0])
+            print(cible)
+            robot.go_to_pose(pose_tab[cible], relative_to_robot=False).wait_for_completed()
+            robot.add_event_handler(cozmo.world.EvtNewCameraImage, on_new_camera_image)        
+            take_photo(robot)
+            print("picture ok")
+            Function_path[0](robot)
+            print("function ok")
+            ID_path.pop(0) # POP le 1er élément
+            Function_path.pop(0) 
+            
+            path_object.pop(0) # ne pas redétecter les objets sur lequel on est déjà passé
+            robot.world.undefine_all_custom_marker_objects()
+            for cust_cube in path_object:
+                eval(cust_cube)
                 
-                path_object.pop(0) # ne pas redétecter les objets sur lequel on est déjà passé
-                robot.world.undefine_all_custom_marker_objects()
-                for cust_cube in path_object:
-                    eval(cust_cube)
-                    
-                print(ID_path)
+            print(ID_path)
         
 
 

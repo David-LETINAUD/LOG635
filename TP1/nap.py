@@ -8,4 +8,4 @@ def nap(robot: cozmo.robot.Robot):
     robot.play_anim_trigger(cozmo.anim.Triggers.GoToSleepGetOut).wait_for_completed()
 
 
-cozmo.run_program(nap)
+#cozmo.run_program(nap)

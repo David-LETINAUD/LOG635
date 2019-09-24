@@ -9,25 +9,28 @@ from cozmo.util import Pose,degrees,distance_mm
 from coffee import *
 from camera import *
 from alarm import *
-from reveil import reveil
+from reveil import *
 from cube_stack import *
+from nap import *
+from sing import *
+from mirror import *
 
 custom_object = None
 
 # list FIFO
-ID_path = [4,5,6,7,8,9,10,11,12,13,14,15]
-Function_path = [coffee, reveil, alarm_clock]
-
-
+ID_path = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]
+Function_path = [alarm_clock, reveil, coffee, sing, mirror, nap]
 
 # object found
-object_found = [] 
+#object_found = [] 
 
 def handle_object_appeared(evt, **kw):   
     # Cela sera appelé chaque fois qu'un EvtObjectAppeared est déclanché
     # chaque fois qu'un objet entre en vue
     if isinstance(evt.obj, CustomObject):
-        print(f"Cozmo started seeing a {str(evt.obj.object_type)}")
+        type_nb = int(str(str(evt.obj.object_type).split('.')[1])[-2:])
+        print(type_nb)
+        print(f"Cozmo started seeing a {str(evt.obj.object_type) } " +  str(str(evt.obj.object_type).split('.')[1])[-2:] + " ID " + str(evt.obj.object_id)  )
         #object_found.append(evt.obj.get_id())
         #if ID_path[0] in res:
             # go to pose #aller à la position de ID_path[0]
@@ -48,18 +51,26 @@ def custom_objects(robot: cozmo.robot.Robot):
 
 
     path_object = ['robot.world.define_custom_cube(CustomObjectTypes.CustomType00,CustomObjectMarkers.Circles2,60, 24.19, 24.19, True)',
-                   'robot.world.define_custom_cube(CustomObjectTypes.CustomType01,CustomObjectMarkers.Circles3,60, 24.19, 24.19, True)'
+                   'robot.world.define_custom_cube(CustomObjectTypes.CustomType01,CustomObjectMarkers.Circles3,60, 24.19, 24.19, True)',
+                   'robot.world.define_custom_cube(CustomObjectTypes.CustomType02,CustomObjectMarkers.Circles4,60, 24.19, 24.19, True)',
+                   'robot.world.define_custom_cube(CustomObjectTypes.CustomType03,CustomObjectMarkers.Circles5,60, 24.19, 24.19, True)',
+                   'robot.world.define_custom_cube(CustomObjectTypes.CustomType04,CustomObjectMarkers.Diamonds2,60, 24.19, 24.19, True)',
+                   'robot.world.define_custom_cube(CustomObjectTypes.CustomType05,CustomObjectMarkers.Diamonds3,60, 24.19, 24.19, True)',
+                   'robot.world.define_custom_cube(CustomObjectTypes.CustomType06,CustomObjectMarkers.Diamonds4,60, 24.19, 24.19, True)',
+                   'robot.world.define_custom_cube(CustomObjectTypes.CustomType07,CustomObjectMarkers.Diamonds5,60, 24.19, 24.19, True)',
+                   'robot.world.define_custom_cube(CustomObjectTypes.CustomType08,CustomObjectMarkers.Hexagons2,60, 24.19, 24.19, True)',
+                   'robot.world.define_custom_cube(CustomObjectTypes.CustomType09,CustomObjectMarkers.Hexagons3,60, 24.19, 24.19, True)',
+                   'robot.world.define_custom_cube(CustomObjectTypes.CustomType10,CustomObjectMarkers.Hexagons4,60, 24.19, 24.19, True)',
+                   'robot.world.define_custom_cube(CustomObjectTypes.CustomType11,CustomObjectMarkers.Hexagons5,60, 24.19, 24.19, True)',
+                   'robot.world.define_custom_cube(CustomObjectTypes.CustomType12,CustomObjectMarkers.Triangles2,60, 24.19, 24.19, True)',
+                   'robot.world.define_custom_cube(CustomObjectTypes.CustomType13,CustomObjectMarkers.Triangles3,60, 24.19, 24.19, True)',
+                   'robot.world.define_custom_cube(CustomObjectTypes.CustomType14,CustomObjectMarkers.Triangles4,60, 24.19, 24.19, True)',
+                   'robot.world.define_custom_cube(CustomObjectTypes.CustomType15,CustomObjectMarkers.Triangles5,60, 24.19, 24.19, True)'
     ]
 
-    #path_object.pop()         
-    #robot.world.undefine_all_custom_marker_objects()
     for cust_cube in path_object:
         eval(cust_cube)
     
-
-    #for fnc in path_object:
-    #    fnc()
-
     if (path_object is not None):# and  path_object[1] is not None):
         print("All objects defined successfully!")
     else:
@@ -72,7 +83,7 @@ def custom_objects(robot: cozmo.robot.Robot):
     
     while len(ID_path)!=0 :
         print("WHILE")
-        num_cust_obj = 2
+        num_cust_obj = 4
         marker = []
         marker_id = []
         pose_tab = []
@@ -81,7 +92,7 @@ def custom_objects(robot: cozmo.robot.Robot):
         lookaround = robot.start_behavior(cozmo.behavior.BehaviorTypes.LookAroundInPlace)
         print("look_end")
 
-        marker = robot.world.wait_until_observe_num_objects(num=num_cust_obj, object_type=CustomObject, timeout=60)
+        marker = robot.world.wait_until_observe_num_objects(num=num_cust_obj, object_type=CustomObject, timeout=600)
         print("marker_end")
         #marker = robot.world.wait_until_observe_num_objects(num=2, object_type=cozmo.objects.LightCube, timeout=60)
         lookaround.stop()
@@ -91,7 +102,10 @@ def custom_objects(robot: cozmo.robot.Robot):
         for m in marker:
             print("ID")
             print(m.object_id)
-            marker_id.append(m.object_id)
+            type_nb = int(str(str(m.object_type).split('.')[1])[-2:])
+            print(type_nb)
+            #marker_id.append(m.object_id)
+            marker_id.append(type_nb)
             pose_tab.append(Pose(m.pose.position.x - 90, m.pose.position.y - 0, 0, angle_z= degrees(0)))
 
         for i in range(num_cust_obj):
@@ -117,33 +131,8 @@ def custom_objects(robot: cozmo.robot.Robot):
                     eval(cust_cube)
                     
                 print(ID_path)
-                print()
-                print()
         
 
-    if len(marker) > len(path_object)-1:
-        print("Found object")
-        #a = super(CustomObject, cubes[0])
-        #b = super(CustomObject, cubes[1])
-        pose_tab = []
-        for c in marker:
-            pose_tab.append(Pose(c.pose.position.x - 90, c.pose.position.y - 0, 0, angle_z= degrees(0)))
-
-        robot.go_to_pose(pose_tab[0], relative_to_robot=False).wait_for_completed()
-        robot.add_event_handler(cozmo.world.EvtNewCameraImage, on_new_camera_image)        
-        take_photo(robot)
-        robot.say_text("I got it !").wait_for_completed()
-
-        robot.go_to_pose(pose_tab[1], relative_to_robot=False).wait_for_completed()
-        robot.add_event_handler(cozmo.world.EvtNewCameraImage, on_new_camera_image)        
-        take_photo(robot)
-
-
-        #robot.go_to_object(cubes[0],distance_mm(50.0)).wait_for_completed()
-        #robot.go_to_pose(cubes[1].pose,relative_to_robot=False)
-        print("Got to object")       
-    else:
-        print("Cannot locate custom box")
 
     while True:
         time.sleep(0.1)

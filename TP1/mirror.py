@@ -40,7 +40,7 @@ def calc_pixel_threshold(image: Image):
     return mean_value
 
 
-def cozmo_face_mirror(robot: cozmo.robot.Robot):
+def mirror(robot: cozmo.robot.Robot):
     '''Continuously display Cozmo's camera feed back on his face.'''
 
     robot.camera.image_stream_enabled = True
@@ -81,4 +81,4 @@ def cozmo_face_mirror(robot: cozmo.robot.Robot):
             break
 
 
-cozmo.run_program(cozmo_face_mirror)
+#cozmo.run_program(cozmo_face_mirror)

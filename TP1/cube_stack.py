@@ -11,7 +11,7 @@ def cube_stack(robot: cozmo.robot.Robot):
         print("Error: need 2 Cubes but only found", len(cubes), "Cube(s)")
     else:
         # Try and pickup the 1st cube
-        current_action = robot.pickup_object(cubes[0], num_retries=3)
+        current_action = robot.pickup_object(cubes[0], num_retries=5)
         current_action.wait_for_completed()
         if current_action.has_failed:
             code, reason = current_action.failure_reason
@@ -20,7 +20,7 @@ def cube_stack(robot: cozmo.robot.Robot):
             return
 
         # Now try to place that cube on the 2nd one
-        current_action = robot.place_on_object(cubes[1], num_retries=3)
+        current_action = robot.place_on_object(cubes[1], num_retries=5)
         current_action.wait_for_completed()
         if current_action.has_failed:
             code, reason = current_action.failure_reason

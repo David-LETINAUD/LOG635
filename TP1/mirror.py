@@ -47,11 +47,9 @@ def mirror(robot: cozmo.robot.Robot):
     get_in_position(robot)
 
     face_dimensions = cozmo.oled_face.SCREEN_WIDTH, cozmo.oled_face.SCREEN_HALF_HEIGHT
-
+    duration_s = 0.1  # time to display each camera frame on Cozmo's face
     cpt = 0
-    while True:
-        duration_s = 0.1  # time to display each camera frame on Cozmo's face
-
+    while cpt<70:
         latest_image = robot.world.latest_image
 
         if latest_image is not None:
@@ -77,8 +75,6 @@ def mirror(robot: cozmo.robot.Robot):
 
         time.sleep(duration_s)
         cpt = cpt + 1
-        if cpt >= 70:
-            break
-
+    time.sleep(0.5)
 
 #cozmo.run_program(cozmo_face_mirror)

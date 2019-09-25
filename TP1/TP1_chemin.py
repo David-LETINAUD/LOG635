@@ -28,14 +28,14 @@ custom_object = None
 
 # list FIFO
 ID_path = [0,1,2,3,4,5,6,7,8,9,10,11,12]#,13,14,15]
-Function_path = [reveil,alarm_clock, coffee,sing, mirror, nap,known_face,zombie,boo,elephant, text,lastone,cube_roll,cube_stack,cube_unstack ]
+Function_path = [reveil,alarm_clock, coffee,mirror,sing, nap,known_face,zombie,boo,elephant, text,lastone,cube_roll,cube_stack,cube_unstack ]
 
 marker = []
 marker_id = []
 pose_tab = []
 obj_tab = []
 
-max_cust_obj = 5
+max_cust_obj = 4
 
 def handle_object_appeared(evt, **kw):   
     global marker 
@@ -81,7 +81,8 @@ def custom_objects(robot: cozmo.robot.Robot):
     path_object = ['robot.world.define_custom_cube(CustomObjectTypes.CustomType00,CustomObjectMarkers.Circles2,60, 24.19, 24.19, True)',
                    'robot.world.define_custom_cube(CustomObjectTypes.CustomType01,CustomObjectMarkers.Circles3,60, 24.19, 24.19, True)',
                    'robot.world.define_custom_cube(CustomObjectTypes.CustomType02,CustomObjectMarkers.Circles4,60, 24.19, 24.19, True)',
-                   'robot.world.define_custom_cube(CustomObjectTypes.CustomType03,CustomObjectMarkers.Circles5,60, 24.19, 24.19, True)',
+                   'robot.world.define_custom_cube(CustomObjectTypes.CustomType03,CustomObjectMarkers.Triangles3,60, 24.19, 24.19, True)',
+                   #'robot.world.define_custom_cube(CustomObjectTypes.CustomType03,CustomObjectMarkers.Circles5,60, 24.19, 24.19, True)',
                    'robot.world.define_custom_cube(CustomObjectTypes.CustomType04,CustomObjectMarkers.Diamonds2,60, 24.19, 24.19, True)',
                    'robot.world.define_custom_cube(CustomObjectTypes.CustomType05,CustomObjectMarkers.Diamonds3,60, 24.19, 24.19, True)',
                    'robot.world.define_custom_cube(CustomObjectTypes.CustomType06,CustomObjectMarkers.Diamonds4,60, 24.19, 24.19, True)',
@@ -106,10 +107,11 @@ def custom_objects(robot: cozmo.robot.Robot):
         return
 
     initial_pose = robot.pose
-    
+    id_prec = 0
     while len(ID_path)!=0 :
         print("WHILE")
         num_cust_obj = 1
+        robot.turn_in_place(degrees(-17*id_prec)).wait_for_completed()
         lookaround = robot.start_behavior(cozmo.behavior.BehaviorTypes.LookAroundInPlace)
         print("look_end")
 
@@ -125,6 +127,7 @@ def custom_objects(robot: cozmo.robot.Robot):
             print(cible)#, obj_tab[cible].object_type)
 
             
+
             collision_avoid_pose = custom_object_pose(robot,obj_tab[cible] )
             #robot.go_to_pose(pose_tab[cible], relative_to_robot=False).wait_for_completed()
             robot.go_to_pose(collision_avoid_pose, relative_to_robot=False).wait_for_completed()
@@ -135,6 +138,9 @@ def custom_objects(robot: cozmo.robot.Robot):
             print("picture ok")
             Function_path[0](robot)
             print("function ok")
+
+            robot.go_to_pose(initial_pose, relative_to_robot=False).wait_for_completed()            
+            id_prec = ID_path[0]
             ID_path.pop(0) # POP le 1er élément
             Function_path.pop(0) 
             #obj_tab.pop(0)
@@ -144,7 +150,7 @@ def custom_objects(robot: cozmo.robot.Robot):
             for cust_cube in path_object[0:min(max_cust_obj, len(path_object))]:
                 eval(cust_cube)
             #robot.drive_straight(distance_mm(-250), speed_mmps(50)).wait_for_completed()
-            robot.go_to_pose(initial_pose, relative_to_robot=False).wait_for_completed()
+            
             print(ID_path)
             if len(ID_path)==0:
                 break 

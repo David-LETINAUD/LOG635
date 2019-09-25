@@ -223,4 +223,4 @@ def alarm_clock(robot: cozmo.robot.Robot):
 
     short_time_string = str(current_time.hour) + ":" + str(current_time.minute)
     robot.say_text("Wake up ! It's " + short_time_string, True, in_parallel=True, duration_scalar=0.5).wait_for_completed()
-    robot.play_anim_trigger(cozmo.anim.Triggers.WorkoutPutDown_highEnergy).wait_for_completed()
+    #robot.play_anim_trigger(cozmo.anim.Triggers.WorkoutPutDown_highEnergy).wait_for_completed()

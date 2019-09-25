@@ -15,16 +15,24 @@ from cubes_unstack import *
 from nap import *
 from sing import *
 from mirror import *
-
+from boo import *
+from elephant import *
+from text import *
+from known_face import *
+from lastone import *
+from roll import *
+from zombie import *
 custom_object = None
 
 # list FIFO
 ID_path = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]
-Function_path = [alarm_clock, reveil, coffee,cube_stack, sing, mirror, nap, cube_unstack ]
+Function_path = [alarm_clock, reveil, coffee, cube_stack,sing, mirror, nap,zombie,cube_unstack,known_face, cube_roll,boo,elephant, text,lastone ]
 
 marker = []
 marker_id = []
 pose_tab = []
+
+
 
 def handle_object_appeared(evt, **kw):   
     global marker 
@@ -40,12 +48,12 @@ def handle_object_appeared(evt, **kw):
         #object_found.append(evt.obj.get_id())
         if type_nb not in marker_id:
             marker_id.append(type_nb)
-            pose_tab.append(Pose(evt.obj.pose.position.x - 90, evt.obj.pose.position.y - 0, 0, angle_z= degrees(0)))
+            pose_tab.append(Pose(evt.obj.pose.position.x -0, evt.obj.pose.position.y - 0, 0, angle_z= degrees(0)))
         else :
             ind = marker_id.index(type_nb)
             print("Position mise à jour")
             # actualiser la position
-            pose_tab[ind] = Pose(evt.obj.pose.position.x - 90, evt.obj.pose.position.y - 0, 0, angle_z= degrees(0))
+            pose_tab[ind] = Pose(evt.obj.pose.position.x -0, evt.obj.pose.position.y - 0, 0, angle_z= degrees(0))
 
 def handle_object_disappeared(evt, **kw):
     # Cela sera appelé lorsqu'un EvtObjectDisappeared est declanché    
@@ -77,8 +85,8 @@ def custom_objects(robot: cozmo.robot.Robot):
                    'robot.world.define_custom_cube(CustomObjectTypes.CustomType11,CustomObjectMarkers.Hexagons5,60, 24.19, 24.19, True)',
                    'robot.world.define_custom_cube(CustomObjectTypes.CustomType12,CustomObjectMarkers.Triangles2,60, 24.19, 24.19, True)',
                    'robot.world.define_custom_cube(CustomObjectTypes.CustomType13,CustomObjectMarkers.Triangles3,60, 24.19, 24.19, True)',
-                   'robot.world.define_custom_cube(CustomObjectTypes.CustomType14,CustomObjectMarkers.Triangles4,60, 24.19, 24.19, True)',
-                   'robot.world.define_custom_cube(CustomObjectTypes.CustomType15,CustomObjectMarkers.Triangles5,60, 24.19, 24.19, True)'
+                   'robot.world.define_custom_cube(CustomObjectTypes.CustomType14,CustomObjectMarkers.Triangles4,60, 24.19, 24.19, True)'#,
+                   #'robot.world.define_custom_cube(CustomObjectTypes.CustomType15,CustomObjectMarkers.Triangles5,60, 24.19, 24.19, True)'
     ]
 
     for cust_cube in path_object:
@@ -90,6 +98,7 @@ def custom_objects(robot: cozmo.robot.Robot):
         print("One or more object definitions failed!")
         return
 
+    initial_pose = robot.pose
     ### 1st step
     #cozmo.run_program(cube_stack, use_3d_viewer=True, use_viewer=True)
     # A TESTER !!! /!\
@@ -140,7 +149,8 @@ def custom_objects(robot: cozmo.robot.Robot):
             robot.world.undefine_all_custom_marker_objects()
             for cust_cube in path_object:
                 eval(cust_cube)
-                
+            #robot.drive_straight(distance_mm(-250), speed_mmps(50)).wait_for_completed()
+            robot.go_to_pose(initial_pose, relative_to_robot=False).wait_for_completed()
             print(ID_path)
         
 

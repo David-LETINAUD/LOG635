@@ -14,7 +14,5 @@ def cube_unstack(robot: cozmo.robot.Robot):
         robot.turn_in_place(degrees(90)).wait_for_completed()
         robot.place_object_on_ground_here(cubes[1])
 
-    while True:
-        time.sleep(0.1)
 
 #cozmo.run_program(cozmo_program, use_viewer=True)

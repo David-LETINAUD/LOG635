@@ -5,6 +5,8 @@ import sys
 import cozmo
 from cozmo.objects import CustomObject, CustomObjectMarkers, CustomObjectTypes, ObservableElement, ObservableObject
 from cozmo.util import Pose,degrees,distance_mm
+from avoid_collision import custom_object_pose
+
 
 from coffee import *
 from camera import *
@@ -31,6 +33,7 @@ Function_path = [reveil,alarm_clock, coffee,sing, mirror, nap,known_face,zombie,
 marker = []
 marker_id = []
 pose_tab = []
+obj_tab = []
 
 max_cust_obj = 5
 
@@ -38,6 +41,7 @@ def handle_object_appeared(evt, **kw):
     global marker 
     global marker_id
     global pose_tab
+    global obj_tab
 
     # Cela sera appelé chaque fois qu'un EvtObjectAppeared est déclenché
     # chaque fois qu'un objet entre en vue
@@ -48,12 +52,14 @@ def handle_object_appeared(evt, **kw):
         #object_found.append(evt.obj.get_id())
         if type_nb not in marker_id:
             marker_id.append(type_nb)
-            pose_tab.append(Pose(evt.obj.pose.position.x -0, evt.obj.pose.position.y - 0, 0, angle_z= degrees(0)))
+            obj_tab.append(evt.obj)
+            #pose_tab.append(Pose(evt.obj.pose.position.x -0, evt.obj.pose.position.y - 0, 0, angle_z= degrees(0)))
         else :
             ind = marker_id.index(type_nb)
             print("Position mise à jour")
             # actualiser la position
-            pose_tab[ind] = Pose(evt.obj.pose.position.x -0, evt.obj.pose.position.y - 0, 0, angle_z= degrees(0))
+            obj_tab[ind] = evt.obj
+            #pose_tab[ind] = Pose(evt.obj.pose.position.x -0, evt.obj.pose.position.y - 0, 0, angle_z= degrees(0))
 
 def handle_object_disappeared(evt, **kw):
     # Cela sera appelé lorsqu'un EvtObjectDisappeared est declanché    
@@ -70,6 +76,7 @@ def custom_objects(robot: cozmo.robot.Robot):
     global marker 
     global marker_id
     global pose_tab
+    global obj_tab
 
     path_object = ['robot.world.define_custom_cube(CustomObjectTypes.CustomType00,CustomObjectMarkers.Circles2,60, 24.19, 24.19, True)',
                    'robot.world.define_custom_cube(CustomObjectTypes.CustomType01,CustomObjectMarkers.Circles3,60, 24.19, 24.19, True)',
@@ -115,15 +122,22 @@ def custom_objects(robot: cozmo.robot.Robot):
             print("FIND")
             print(marker_id , ID_path[0])
             cible = marker_id.index(ID_path[0])
-            print(cible)
-            robot.go_to_pose(pose_tab[cible], relative_to_robot=False).wait_for_completed()
+            print(cible)#, obj_tab[cible].object_type)
+
+            
+            collision_avoid_pose = custom_object_pose(robot,obj_tab[cible] )
+            #robot.go_to_pose(pose_tab[cible], relative_to_robot=False).wait_for_completed()
+            robot.go_to_pose(collision_avoid_pose, relative_to_robot=False).wait_for_completed()
+            
             robot.add_event_handler(cozmo.world.EvtNewCameraImage, on_new_camera_image)        
             take_photo(robot)
+
             print("picture ok")
             Function_path[0](robot)
             print("function ok")
             ID_path.pop(0) # POP le 1er élément
             Function_path.pop(0) 
+            #obj_tab.pop(0)
             
             path_object.pop(0) # ne pas redétecter les objets sur lequel on est déjà passé
             robot.world.undefine_all_custom_marker_objects()

@@ -10,5 +10,5 @@ def known_face(robot: cozmo.robot.Robot):
     
     if face is not None:
         robot.say_text(f"{face.name}").wait_for_completed()
+        time.sleep(2000)
     
-#cozmo.run_program(cozmo_program, use_3d_viewer=True, use_viewer=True)

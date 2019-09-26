@@ -13,7 +13,7 @@ except ImportError:
 
 import cozmo
 
-
+# parametrer position tete et bras cozmo pour voir l'écran
 def get_in_position(robot: cozmo.robot.Robot):
     '''If necessary, Move Cozmo's Head and Lift to make it easy to see Cozmo's face.'''
     if (robot.lift_height.distance_mm > 45) or (robot.head_angle.degrees < 40):
@@ -24,7 +24,7 @@ def get_in_position(robot: cozmo.robot.Robot):
             lift_action.wait_for_completed()
             head_action.wait_for_completed()
 
-
+#seuillage image
 def calc_pixel_threshold(image: Image):
     '''Calculate a pixel threshold based on the image.
 
@@ -32,32 +32,32 @@ def calc_pixel_threshold(image: Image):
     Anything darker will be shown off (black).
     '''
 
-    # Convert image to gray scale
+    # Convertit en image en niveau de gris
     grayscale_image = image.convert('L')
 
-    # Calculate the mean (average) value
+    # calcul de la valeur moyenne
     mean_value = np.mean(grayscale_image.getdata())
     return mean_value
 
-
+#focntion affichage de la camera sur l'écran
 def mirror(robot: cozmo.robot.Robot):
     '''Continuously display Cozmo's camera feed back on his face.'''
 
-    robot.camera.image_stream_enabled = True
+    robot.camera.image_stream_enabled = True #accès a la camera
     get_in_position(robot)
 
     face_dimensions = cozmo.oled_face.SCREEN_WIDTH, cozmo.oled_face.SCREEN_HALF_HEIGHT
     duration_s = 0.1  # time to display each camera frame on Cozmo's face
     cpt = 0
     while cpt<70:
-        latest_image = robot.world.latest_image
+        latest_image = robot.world.latest_image     #dernière image pour 'live'
 
         if latest_image is not None:
-            # Scale the camera image down to fit on Cozmo's face
+            # redimmensionner l'image pour l'afficher sur l'écran
             resized_image = latest_image.raw_image.resize(face_dimensions,
                                                           Image.BICUBIC)
 
-            # Flip the image left/right so it displays mirrored
+            # inverser les côtés gauche et droite pour l'effet miroir
             resized_image = resized_image.transpose(Image.FLIP_LEFT_RIGHT)
 
             # Calculate the pixel threshold for this image. This threshold
@@ -65,12 +65,12 @@ def mirror(robot: cozmo.robot.Robot):
             # for it to be displayed as lit-up on Cozmo's face.
             pixel_threshold = calc_pixel_threshold(resized_image)
 
-            # Convert the image to the format to display on Cozmo's face.
+            # Convertir l'image au format pour l'afficher sur l'écran
             screen_data = cozmo.oled_face.convert_image_to_screen_data(
                 resized_image,
                 pixel_threshold=pixel_threshold)
 
-            # display the image on Cozmo's face
+            # afficher l'image sur l'écran
             robot.display_oled_face_image(screen_data, duration_s * 1000.0)
 
         time.sleep(duration_s)

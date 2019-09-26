@@ -12,13 +12,14 @@ from cozmo.util import degrees, distance_mm, speed_mmps
 directory = '.'
 liveCamera = False
 
+#fonction appellée a chaque photo prise
 def on_new_camera_image(evt, **kwargs):    
     global liveCamera
     if liveCamera:
         print("Cozmo is taking a photo")
-        pilImage = kwargs['image'].raw_image
+        pilImage = kwargs['image'].raw_image #formatage image
         global directory
-        pilImage.save(f"photos/{directory}/{directory}-{kwargs['image'].image_number}.jpeg", "JPEG")
+        pilImage.save(f"photos/{directory}/{directory}-{kwargs['image'].image_number}.jpeg", "JPEG") #sauvegarde l'image dans le dossier
 
 def take_photo(robot: cozmo.robot.Robot):
     global liveCamera    
@@ -27,6 +28,6 @@ def take_photo(robot: cozmo.robot.Robot):
     robot.set_head_angle(degrees(3.0)).wait_for_completed()
     robot.set_lift_height(0.0).wait_for_completed()
         
-    liveCamera = True
+    liveCamera = True #prend photo
     time.sleep(0.1)    
     liveCamera = False   

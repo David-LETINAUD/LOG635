@@ -4,13 +4,13 @@ import time
 def cube_roll(robot: cozmo.robot.Robot):
     # Essai d'émpiler 2 cubes
 
-    lookaround = robot.start_behavior(cozmo.behavior.BehaviorTypes.LookAroundInPlace)
-    cubes = robot.world.wait_until_observe_num_objects(num=1, object_type=cozmo.objects.LightCube, timeout=60)
-    lookaround.stop()
+    lookaround = robot.start_behavior(cozmo.behavior.BehaviorTypes.LookAroundInPlace)   #cherche cube
+    cubes = robot.world.wait_until_observe_num_objects(num=1, object_type=cozmo.objects.LightCube, timeout=60)  #1 cube trouvé
+    lookaround.stop() #arrete de chercher
 
 
-    if len(cubes) <1:
-        print("Error: need a Cubes but only found", len(cubes), "Cube(s)")
+    if len(cubes) <1:   #si 0 cube trouvé
+        print("Error: need a Cubes but only found", len(cubes), "Cube(s)")  #erreur
     else:
         # Essai de faire rouler le cube
         robot.run_timed_behavior(cozmo.behavior.BehaviorTypes.RollBlock, active_time=30)#.wait_for_completed()

@@ -35,7 +35,7 @@ def make_text_image(text_to_draw, x, y, font=None):
     # get a drawing context
     dc = ImageDraw.Draw(text_image)
 
-    # draw the text
+    # dessine le texte
     dc.text((x, y), text_to_draw, fill=(255, 255, 255, 255), font=font)
 
     return text_image
@@ -87,7 +87,7 @@ def draw_clock_hand(dc, cen_x, cen_y, circle_ratio, hand_length):
     dc.polygon([(hand_end_x, hand_end_y), (hand_end_x2, hand_end_y2),
                 (hand_end_x3, hand_end_y3)], fill=(255, 255, 255, 255))
 
-
+#fonction paramétrage de l'image à afficher
 def make_clock_image(current_time):
     '''Make a PIL.Image with the current time displayed on it
 
@@ -109,7 +109,7 @@ def make_clock_image(current_time):
     # get a drawing context
     dc = ImageDraw.Draw(clock_image)
 
-    # calculate position of clock elements
+    # calul de la position de l'heure sur l'écran
     text_height = 9
     screen_width, screen_height = cozmo.oled_face.dimensions()
     analog_width = screen_width
@@ -139,7 +139,7 @@ def make_clock_image(current_time):
 
     return clock_image
 
-
+#fonction pour mettre sous format horaire
 def convert_to_time_int(in_value, time_unit):
     '''Convert in_value to an int and ensure it is in the valid range for that time unit
 
@@ -192,7 +192,7 @@ def extract_time_from_args():
     # Default to no alarm
     return None
 
-
+#definie position du robot pour mieux voir l'heure
 def get_in_position(robot: cozmo.robot.Robot):
     '''If necessary, Move Cozmo's Head and Lift to make it easy to see Cozmo's face'''
     if (robot.lift_height.distance_mm > 45) or (robot.head_angle.degrees < 40):
@@ -203,7 +203,7 @@ def get_in_position(robot: cozmo.robot.Robot):
             lift_action.wait_for_completed()
             head_action.wait_for_completed()
 
-
+#fonction principale
 def alarm_clock(robot: cozmo.robot.Robot):
     '''The core of the alarm_clock program'''
     get_in_position(robot)
@@ -215,12 +215,13 @@ def alarm_clock(robot: cozmo.robot.Robot):
     clock_image = make_clock_image(current_time)
     oled_face_data = cozmo.oled_face.convert_image_to_screen_data(clock_image)
 
-    # display for 4 second
+    # affichage 4s
     robot.display_oled_face_image(oled_face_data, 4000.0,in_parallel=True).wait_for_completed()
 
     # only sleep for a fraction of a second to ensure we update the seconds as soon as they change
     time.sleep(0.1)
 
     short_time_string = str(current_time.hour) + ":" + str(current_time.minute)
+    #Cozmo dit wake up and l'heure qu'il est
     robot.say_text("Wake up ! It's " + short_time_string, True, in_parallel=True, duration_scalar=0.5).wait_for_completed()
     #robot.play_anim_trigger(cozmo.anim.Triggers.WorkoutPutDown_highEnergy).wait_for_completed()

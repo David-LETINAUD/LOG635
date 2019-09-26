@@ -12,5 +12,3 @@ def known_face(robot: cozmo.robot.Robot):
         robot.say_text(f"{face.name}").wait_for_completed()
         time.sleep(2)
     
-    
-    

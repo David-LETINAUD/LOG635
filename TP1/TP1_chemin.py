@@ -27,8 +27,8 @@ from zombie import *
 custom_object = None
 
 # list FIFO
-ID_path = [0,1,2,3,4,5,6,7,8,9,10,11,12]#,13,14,15]
-Function_path = [cube_roll,cube_unstack,cube_stack,reveil,alarm_clock, coffee,mirror,sing, nap,known_face,zombie,boo,elephant, text,lastone ]
+ID_path = [0,1,2,3,4,5,6,7,8,9,10,11]#,12]#,13,14,15]
+Function_path = [cube_unstack,cube_stack,cube_roll,reveil,alarm_clock, coffee,mirror,sing, nap,known_face,zombie,boo,elephant, text,lastone ]
 
 marker = []
 marker_id = []
@@ -90,8 +90,8 @@ def custom_objects(robot: cozmo.robot.Robot):
                    'robot.world.define_custom_cube(CustomObjectTypes.CustomType08,CustomObjectMarkers.Hexagons2,60, 24.19, 24.19, True)',
                    'robot.world.define_custom_cube(CustomObjectTypes.CustomType09,CustomObjectMarkers.Hexagons3,60, 24.19, 24.19, True)',
                    'robot.world.define_custom_cube(CustomObjectTypes.CustomType10,CustomObjectMarkers.Hexagons4,60, 24.19, 24.19, True)',
-                   'robot.world.define_custom_cube(CustomObjectTypes.CustomType11,CustomObjectMarkers.Hexagons5,60, 24.19, 24.19, True)',
-                   'robot.world.define_custom_cube(CustomObjectTypes.CustomType12,CustomObjectMarkers.Triangles2,60, 24.19, 24.19, True)'#,
+                   'robot.world.define_custom_cube(CustomObjectTypes.CustomType11,CustomObjectMarkers.Hexagons5,60, 24.19, 24.19, True)'
+                #   'robot.world.define_custom_cube(CustomObjectTypes.CustomType12,CustomObjectMarkers.Triangles2,60, 24.19, 24.19, True)'#,
                 #    'robot.world.define_custom_cube(CustomObjectTypes.CustomType13,CustomObjectMarkers.Triangles3,60, 24.19, 24.19, True)',
                 #    'robot.world.define_custom_cube(CustomObjectTypes.CustomType14,CustomObjectMarkers.Triangles4,60, 24.19, 24.19, True)',
                 #    'robot.world.define_custom_cube(CustomObjectTypes.CustomType15,CustomObjectMarkers.Triangles5,60, 24.19, 24.19, True)'

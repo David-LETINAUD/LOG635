@@ -99,7 +99,7 @@ def custom_object_pose(robot, custom_object):
 
     # Équation symbolique d'un circle autour de l'objet : (x-c.x)^2 + (y-c.y)^2 = r
     # !!! Le rayon du cercle dépends de la taille de vos objets !!!
-    circle = Eq((x - custom_object.pose.position.x)**2 + (y - custom_object.pose.position.y)**2, 10000)
+    circle = Eq((x - custom_object.pose.position.x)**2 + (y - custom_object.pose.position.y)**2, 20000)
     print(f">>> circle: (x - {custom_object.pose.position.x})**2 + (y - {custom_object.pose.position.y})**2")
 
     # Points d'intersection entre la droite et le cercle

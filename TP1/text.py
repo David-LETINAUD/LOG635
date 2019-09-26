@@ -38,11 +38,11 @@ except IOError:
 
 
 def text(robot: cozmo.robot.Robot):
-    time_text = "TP1 LOG635"
+    time_text = "TP1 LOG635" #texte à afficher
     clock_image = make_text(time_text, 8, 6, _clock_font)
-    oled_face_data = cozmo.oled_face.convert_image_to_screen_data(clock_image)
+    oled_face_data = cozmo.oled_face.convert_image_to_screen_data(clock_image) #converti image pour l'ecran
 
-    # display for 4 seconds
+    # affiche pendant 4 secondes
     robot.display_oled_face_image(oled_face_data, 4000.0,in_parallel=True).wait_for_completed()
 
     # only sleep for a fraction of a second to ensure we update the seconds as soon as they change

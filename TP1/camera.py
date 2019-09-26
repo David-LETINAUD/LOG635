@@ -24,7 +24,7 @@ def take_photo(robot: cozmo.robot.Robot):
     global liveCamera    
     
     # Assurez-vous que la tête et le bras de Cozmo sont à un niveau raisonnable
-    #robot.set_head_angle(degrees(10.0)).wait_for_completed()
+    robot.set_head_angle(degrees(3.0)).wait_for_completed()
     robot.set_lift_height(0.0).wait_for_completed()
         
     liveCamera = True

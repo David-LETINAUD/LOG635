@@ -1,4 +1,5 @@
 import cozmo
+import time
 def cube_stack(robot: cozmo.robot.Robot):
     # Attempt to stack 2 cubes
 
@@ -29,3 +30,4 @@ def cube_stack(robot: cozmo.robot.Robot):
             return
 
         print("Cozmo successfully stacked 2 blocks!")
+    time.sleep(1)

@@ -28,7 +28,7 @@ custom_object = None
 
 # list FIFO
 ID_path = [0,1,2,3,4,5,6,7,8,9,10,11,12]#,13,14,15]
-Function_path = [reveil,alarm_clock, coffee,mirror,sing, nap,known_face,zombie,boo,elephant, text,lastone,cube_roll,cube_stack,cube_unstack ]
+Function_path = [cube_roll,cube_unstack,cube_stack,reveil,alarm_clock, coffee,mirror,sing, nap,known_face,zombie,boo,elephant, text,lastone ]
 
 marker = []
 marker_id = []
@@ -108,6 +108,15 @@ def custom_objects(robot: cozmo.robot.Robot):
 
     initial_pose = robot.pose
     id_prec = 0
+
+    # finir par les fonctions cubes
+    #while len(Function_path)!=0 :    
+    for i in range(3):
+        Function_path[0](robot)
+        robot.go_to_pose(initial_pose, relative_to_robot=False).wait_for_completed()     
+        print("pose ok")
+        Function_path.pop(0) 
+
     while len(ID_path)!=0 :
         print("WHILE")
         num_cust_obj = 1
@@ -155,11 +164,7 @@ def custom_objects(robot: cozmo.robot.Robot):
             if len(ID_path)==0:
                 break 
 
-    # finir par les fonctions cubes
-    while len(Function_path)!=0 :    
-        Function_path[0](robot)
-        print("function ok")
-        Function_path.pop(0) 
+    
 
 
 # Indiquer le dossier pour stocker les photos

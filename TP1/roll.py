@@ -1,4 +1,5 @@
 import cozmo
+import time
 
 def cube_roll(robot: cozmo.robot.Robot):
     # Essai d'émpiler 2 cubes
@@ -12,7 +13,7 @@ def cube_roll(robot: cozmo.robot.Robot):
         print("Error: need a Cubes but only found", len(cubes), "Cube(s)")
     else:
         # Essai de faire rouler le cube
-        robot.run_timed_behavior(cozmo.behavior.BehaviorTypes.RollBlock, active_time=60)#.wait_for_completed()
+        robot.run_timed_behavior(cozmo.behavior.BehaviorTypes.RollBlock, active_time=30)#.wait_for_completed()
         #current_action.wait_for_completed()
         # if current_action.has_failed:
         #     code, reason = current_action.failure_reason
@@ -22,6 +23,7 @@ def cube_roll(robot: cozmo.robot.Robot):
 
         print("Cozmo successfully roll a block!")
 
+    time.sleep(1)
 #cozmo.run_program(cube_roll, use_3d_viewer=True, use_viewer=True)
 
 

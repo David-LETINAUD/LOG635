@@ -11,7 +11,7 @@ import Augmentor
 from IPython.core.interactiveshell import InteractiveShell
 InteractiveShell.ast_node_interactivity = "all"
 
-#data_dir = Path.cwd() / "./EnsembleA_A2019"
+
 data_dir = Path("./data/Markers")
 
 
@@ -44,5 +44,5 @@ for first_level in data_dir.glob('*'):
 
                 #print(second_level)
                 data_dir_img = Path(second_level)
-                dataset_augmentation(data_dir_img,100)
+                dataset_augmentation(data_dir_img,10000)
 

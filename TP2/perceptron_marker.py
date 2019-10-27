@@ -98,10 +98,10 @@ y_train = np.array([y_train]).T
 
 print(y_train.shape)
 # A faire : transformer y = [1,0,0,2,4,8...]    # Chaque numéro correspond à 1 classe (ici 8 classes)
-#                EN     y = [0,1,0,0,0,0,0,0 ;  # correspond à 1
-#                            1,0,0,0,0,0,0,0;   # correspond à 0
-#                            1,0,0,0,0,0,0,0;
-#                            0,0,1,0,0,0,0,0;   # correspond à 2
+#                EN     y = [[0,1,0,0,0,0,0,0],  # correspond à 1
+#                            [1,0,0,0,0,0,0,0],   # correspond à 0
+#                            [1,0,0,0,0,0,0,0],
+#                            [0,0,1,0,0,0,0,0],   # correspond à 2
 #                            ...
 
 X_test = X[training_size:data_size]

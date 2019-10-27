@@ -37,8 +37,8 @@ def dataset_augmentation(data_directory, nb_img):
     p.sample(nb_img)
 
 # Image resize
-WIDTH = 160
-HEIGHT = 120
+WIDTH = 28
+HEIGHT = 28
 
 # Dataset: this list will contain all the images
 data_set = []
@@ -60,18 +60,18 @@ for first_level in data_dir.glob('*'):
 
                     ###### 3. Augmentation du dataset ######
                     # On pourrait prendre en compte la quantité déjà existante pour etre sûr que le dataset est balancé                    
-                    dataset_augmentation(data_dir_img,2000)
+                    dataset_augmentation(data_dir_img,500)
                     for img_path in data_dir_img.glob('*.jpg'):
                         #   print(img_path)
                         img = cv2.imread(str(img_path), cv2.IMREAD_GRAYSCALE)
 
                         ###### 2. Réduction de la taille des images ######
-                        # resized = cv2.resize(img, (WIDTH, HEIGHT))
+                        resized = cv2.resize(img, (WIDTH, HEIGHT))
                         # Plot image
                         # plt.imshow(resized)
                         # plt.show(block=True)
 
-                        data_set.append([img, class_num, label])
+                        data_set.append([resized, class_num, label])
                 except:
                     print("Not in the dataset" + label)
           

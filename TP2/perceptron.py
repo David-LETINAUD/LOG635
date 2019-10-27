@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-#import idx2numpy
+import idx2numpy
 from tabulate import tabulate
 
 # Always run this cell to display the complete output in the cells, not just the last result.
@@ -75,7 +75,6 @@ ppn.train(training_set_inputs, training_set_outputs)
 plt.plot(range(1, len(ppn.errors_) + 1), ppn.errors_, marker='o')
 plt.xlabel('Epochs')
 plt.ylabel('Number of iterations')
- 
 plt.tight_layout()
 plt.show()
 

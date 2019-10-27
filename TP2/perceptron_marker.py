@@ -1,11 +1,15 @@
 import numpy as np
-import matplotlib.pyplot as plt
 import idx2numpy
 from tabulate import tabulate
 import pickle
 from pathlib import Path
 from sklearn.preprocessing import LabelEncoder
 from skimage.transform import resize
+from sklearn.datasets import fetch_openml
+from sklearn.linear_model import SGDClassifier
+import matplotlib as mpl
+import matplotlib.pyplot as plt
+from sklearn.multiclass import OneVsRestClassifier
 
 # Always run this cell to display the complete output in the cells, not just the last result.
 from IPython.core.interactiveshell import InteractiveShell
@@ -36,6 +40,38 @@ def sigma(x):
 #     z_exp = [np.exp(i) for i in z]
 #     sum_z_exp = sum(z_exp)
 #     return [i / sum_z_exp for i in z_exp]
+
+# Creating the classifier
+
+def multiClassify():
+
+    sgd_classifier = SGDClassifier(random_state=42)
+    # Training
+    sgd_classifier.fit(X_train_flat, y_train)
+    position = 0
+
+    # Predicted value
+    sgd_classifier.predict([X_train_flat[position]])
+
+    # Getting a feature
+    some_digit = X_train_flat[0]
+
+    #Acutal value
+    y[position]
+
+    # Digit image
+    plot_digit(X_train_flat[position])
+
+    #retourne 10 scores
+    some_digit_scores = sgd_classifier.decision_function([some_digit])
+
+    #Le score le plus élevé est en effet celui correspondant à la classe prédite
+    sgd_classifier.classes_[np.argmax(some_digit_scores)]
+
+    ova_clf = OneVsRestClassifier(sgd_classifier)
+    ova_clf.fit(X_train_flat, y_train)
+    ova_clf.predict([some_digit])
+    #len(ova_clf.estimators_))
 
 class Perceptron:
     """Perceptron classifier."""
@@ -76,6 +112,14 @@ class Perceptron:
         #z = softmax(np.dot(X, self.w_[1:]) + self.w_[0])
         return z
 
+
+def plot_digit(digit):
+    digit_image = digit.reshape(28, 28)
+    #plt.imshow(digit_image, cmap = mpl.cm.binary, interpolation="nearest")
+    plt.imshow(digit_image, cmap = 'gray', interpolation="nearest")
+    plt.axis("off")
+    plt.show()
+
 # Lecture X et y
 X = pickle.load( open("X.pickle", 'rb') )
 y = pickle.load( open("y.pickle", 'rb') )
@@ -103,6 +147,9 @@ print(y_train.shape)
 #                            [1,0,0,0,0,0,0,0],
 #                            [0,0,1,0,0,0,0,0],   # correspond à 2
 #                            ...
+
+multiClassify()
+
 
 # Autre idée : Faire 1 perceptron pour chaque classe (ici 8 classes)
 #              Chaque predict d'1 perceptron sortira une proba en 0 et 1 -> activation prend une décision
@@ -162,3 +209,5 @@ print(tabulate({
                 "Predicted value": results,
                 "Actual value": y_test
                }, headers="keys"))    
+
+

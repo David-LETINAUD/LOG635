@@ -104,6 +104,10 @@ print(y_train.shape)
 #                            [0,0,1,0,0,0,0,0],   # correspond à 2
 #                            ...
 
+# Autre idée : Faire 1 perceptron pour chaque classe (ici 8 classes)
+#              Chaque predict d'1 perceptron sortira une proba en 0 et 1 -> activation prend une décision
+#              Combinaison de chaque résultat dans une tableau 1x8 pour correspondre à la décision finale
+
 X_test = X[training_size:data_size]
 #X_test_flat = np.array([resize(i, (28, 28)).flatten() for i in X_test])
 X_test_flat = np.array([i.flatten() for i in X_test])

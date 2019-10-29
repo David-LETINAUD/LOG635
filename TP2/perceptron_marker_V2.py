@@ -1,6 +1,5 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import idx2numpy
 from tabulate import tabulate
 import pickle
 
@@ -41,8 +40,7 @@ class Perceptron:
         """Function to train the neuron, which modifies the weights (w) based on the input values 
         and expected results.    
         """
-        self.w_ = np.zeros( (8,1 + X.shape[1]) )
-        
+        self.w_ = np.zeros( (8,1 + X.shape[1]) )        
         self.errors_ = []
 
         for _ in range(self.n_iters):

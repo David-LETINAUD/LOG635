@@ -3,7 +3,6 @@ import matplotlib.pyplot as plt
 import idx2numpy
 from tabulate import tabulate
 import pickle
-from pathlib import Path
 
 # Always run this cell to display the complete output in the cells, not just the last result.
 from IPython.core.interactiveshell import InteractiveShell
@@ -11,9 +10,27 @@ InteractiveShell.ast_node_interactivity = "all"
 
 LABELS = [ "Circle2", "Circle5", "Diamond2","Diamond5", "Hexagon2", "Hexagon5", "Triangle2", "Triangle5"]
 
+
+#################################  Functions
 def sigma(x):
     return 1 / (1 + np.exp(-x))
 
+def flatten_x(x):
+    return np.array([i.flatten() for i in x])
+
+def vectorize_y(y):
+    y_vec = []
+    for str_lbl in y :
+        y_vec.append( [1*(i==str_lbl) for i in LABELS] )
+    return np.array(y_vec)
+
+def accuracy(y_predict,y):
+    y_pred_int = np.array( [np.argmax(p) for p in y_predict])
+    y_int = np.array( [np.argmax(p) for p in y])
+    VP = np.sum( np.equal(y_pred_int, y_int) )
+    return VP/len(y_int)
+
+#################################  Perceptron Class
 class Perceptron:
     """Perceptron classifier."""
     def __init__(self, eta=0.1, n_iters=10):
@@ -72,21 +89,10 @@ class Perceptron:
 X = pickle.load( open("X.pickle", 'rb') )
 y = pickle.load( open("y.pickle", 'rb') )
 
-# Découpage du dataset
+# Taille du dataset
+train_ratio = 0.8
 data_size = len(y)
-training_size = int( 0.8 * data_size)
-
-X_train = X[0:training_size]
-
-print([1*(i=="Circle5") for i in LABELS])
-
-def flatten_x(x):
-    return np.array([i.flatten() for i in x])
-def vectorize_y(y):
-    y_vec = []
-    for str_lbl in y :
-        y_vec.append( [1*(i==str_lbl) for i in LABELS] )
-    return np.array(y_vec)
+training_size = int( train_ratio * data_size)
 
 # Mise en forme des données
 X = flatten_x(X)
@@ -132,3 +138,6 @@ print(tabulate({
                 "Predicted value": results,
                 "Actual value": y_test
                }, headers="keys"))    
+
+acc = accuracy(results,y_test)
+print(acc)

@@ -1,16 +1,9 @@
-# A faire :   Fonction Extract & flatten & split data (pour x et y)
-#             Calcul de l'accuracy
-#             Tester si accuracy est mieux avec normalisation (/255)
-#             Faire des calculs matricielles à la place des boucles
-
 import numpy as np
 import matplotlib.pyplot as plt
 import idx2numpy
 from tabulate import tabulate
 import pickle
 from pathlib import Path
-from sklearn.preprocessing import LabelEncoder
-from skimage.transform import resize
 
 # Always run this cell to display the complete output in the cells, not just the last result.
 from IPython.core.interactiveshell import InteractiveShell
@@ -18,30 +11,8 @@ InteractiveShell.ast_node_interactivity = "all"
 
 LABELS = [ "Circle2", "Circle5", "Diamond2","Diamond5", "Hexagon2", "Hexagon5", "Triangle2", "Triangle5"]
 
-training_set_inputs = np.array([[1,1,0,0,0,0,1],[1,0,0,0,0,0,1],[1,1,0,0,0,1,0],[1,0,0,0,0,1,0],
-                               [1,1,0,0,0,1,1],[1,0,0,0,0,1,1],[1,1,0,0,1,0,0],[1,0,0,0,1,0,0],
-                               [1,1,0,0,1,0,1],[1,0,0,0,1,0,1],[1,1,0,0,1,1,0],[1,0,0,0,1,1,0],
-                               [1,1,0,0,1,1,1],[1,0,0,0,1,1,1],[1,1,0,1,0,0,0],[1,0,0,1,0,0,0],
-                               [1,1,0,1,0,0,1],[1,0,0,1,0,0,1],[1,1,0,1,0,1,0],[1,0,0,1,0,1,0],
-                               [1,1,0,1,0,1,1],[1,0,0,1,0,1,1],[1,1,0,1,1,0,0],[1,0,0,1,1,0,0],
-                               [1,1,0,1,1,0,1],[1,0,0,1,1,0,1],[1,1,0,1,1,1,0],[1,0,0,1,1,1,0],
-                               [1,1,0,1,1,1,1],[1,0,0,1,1,1,1],[1,1,1,0,0,0,0],[1,0,1,0,0,0,0],
-                               [1,1,1,0,0,0,1],[1,0,1,0,0,0,1],[1,1,1,0,0,1,0],[1,0,1,0,0,1,0],
-                               [1,1,1,0,0,1,1],[1,0,1,0,0,1,1],[1,1,1,0,1,0,0],[1,0,1,0,1,0,0]])
-
-# The «.T» function transposes the matrix from horizontal to vertical.
-training_set_outputs = np.array([[1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0]]).T
-
 def sigma(x):
     return 1 / (1 + np.exp(-x))
-# def softmax(A):
-#     expA = np.exp(A)
-#     return expA / expA.sum()
-
-# def softmax(z):
-#     z_exp = [np.exp(i) for i in z]
-#     sum_z_exp = sum(z_exp)
-#     return [i / sum_z_exp for i in z_exp]
 
 class Perceptron:
     """Perceptron classifier."""
@@ -53,7 +24,7 @@ class Perceptron:
         """Function to train the neuron, which modifies the weights (w) based on the input values 
         and expected results.    
         """
-        self.w_ = np.zeros( (8,1 + X.shape[1]) )#8)#*X.shape[2])
+        self.w_ = np.zeros( (8,1 + X.shape[1]) )
         
         self.errors_ = []
 
@@ -107,50 +78,35 @@ training_size = int( 0.8 * data_size)
 
 X_train = X[0:training_size]
 
-#X_train_flat = np.array([resize(i, (28, 28)).flatten() for i in X_train])
-X_train_flat = np.array([i.flatten() for i in X_train])
+print([1*(i=="Circle5") for i in LABELS])
 
-#y_train = np.array([y[0:training_size]]).T
-y_train = y[0:training_size]
+def flatten_x(x):
+    return np.array([i.flatten() for i in x])
+def vectorize_y(y):
+    y_vec = []
+    for str_lbl in y :
+        y_vec.append( [1*(i==str_lbl) for i in LABELS] )
+    return np.array(y_vec)
 
-labelencoder_y = LabelEncoder()
-y_train = labelencoder_y.fit_transform(y_train)
-y_train = np.array([y_train]).T
+# Mise en forme des données
+X = flatten_x(X)
+y = vectorize_y(y) 
 
-def conv_y(y_train): 
-    y_train_tab = []   
-    for i in y_train:
-        y_tab = [0,0,0,0,0,0,0,0]
-        y_tab[i[0]] = 1
-        y_train_tab.append(y_tab)
+# Split les données
+X_train = X[:training_size]
+y_train = y[:training_size]
 
-    return y_train_tab
+X_test = X[training_size:]
+y_test = y[training_size:]
 
-y_train_tab = conv_y(y_train)
-print(y_train.shape)
-
-X_test = X[training_size:data_size]
-#X_test_flat = np.array([resize(i, (28, 28)).flatten() for i in X_test])
-X_test_flat = np.array([i.flatten() for i in X_test])
-y_test = y[training_size:data_size]
-
-y_test = labelencoder_y.fit_transform(y_test)
-y_test = np.array([y_test]).T
-
-y_test_tab = conv_y(y_test)
-
-print(y_test.shape)
-
-print(training_set_inputs.shape,training_set_outputs.shape )
-print(data_size, X_train_flat.shape, y_train.shape)
-print(data_size, X_test_flat.shape, y_test.shape)
+print(data_size, X_train.shape, y_train.shape)
+print(data_size, X_test.shape, y_test.shape)
 
 # Init the perceptron
 ppn = Perceptron(eta=0.1, n_iters=50)
  
 # # Training with X and y
-# ppn.train(training_set_inputs, training_set_outputs)
-ppn.train(X_train_flat, y_train_tab)
+ppn.train(X_train, y_train)
 
 # # # Plotting
 plt.plot(range(1, len(ppn.errors_) + 1), ppn.errors_, marker='o')
@@ -160,23 +116,14 @@ plt.ylabel('Number of iterations')
 plt.tight_layout()
 plt.show()
 
-#Testing
 
-# testing_set_inputs = np.array([[1,1,1,0,1,0,1],[1,0,1,0,1,0,1],[1,1,1,0,1,1,0],[1,0,1,0,1,1,0],
-#                          [1,1,1,0,1,1,1],[1,0,1,0,1,1,1],[1,1,1,1,0,0,0],[1,0,1,1,0,0,0],
-#                          [1,1,1,1,0,0,1],[1,0,1,1,0,0,1],[1,1,1,1,0,1,0],[1,0,1,1,0,1,0]])
-
-# testing_set_outputs = np.array([[1,0,1,0,1,0,1,0,1,0,1,0]]).T
-
-
+# Testing
 results = []
 
-
-for x in (range(len(X_test_flat))):
-    run = X_test_flat[x]
+for x in (range(len(X_test))):
+    run = X_test[x]
     trial = ppn.activation(run)
     results.append(trial.tolist())
-    
     
 print("RESULTS:")
             

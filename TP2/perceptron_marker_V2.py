@@ -1,3 +1,8 @@
+# A faire :   Fonction Extract & flatten & split data (pour x et y)
+#             Calcul de l'accuracy
+#             Tester si accuracy est mieux avec normalisation (/255)
+#             Faire des calculs matricielles à la place des boucles
+
 import numpy as np
 import matplotlib.pyplot as plt
 import idx2numpy

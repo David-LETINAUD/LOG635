@@ -14,14 +14,14 @@ InteractiveShell.ast_node_interactivity = "all"
 
 class_names = [ "Circle2", "Circle5", "Diamond2","Diamond5", "Hexagon2", "Hexagon5", "Triangle2", "Triangle5"]
 
-#################################  Functions
+########################################  Functions
 def accuracy(y_predict,y):
     y_pred_int = np.array( [np.argmax(p) for p in y_predict])
     y_int = np.array( [np.argmax(p) for p in y])
     VP = np.sum( np.equal(y_pred_int, y_int) )
     return VP/len(y_int)
 
-
+########################################  Load & Data manipulations
 # Lecture X et y
 X = np.array(pickle.load( open("X.pickle", 'rb') ))
 y = np.array(pickle.load( open("y.pickle", 'rb') ))
@@ -54,27 +54,24 @@ print(y_train.shape, y_test.shape)
 N_FEATURES = X.shape[1]
 N_CLASSES = len(class_names)
 
-nn = NNClassifier(
-    n_classes=N_CLASSES, 
-    n_features=N_FEATURES,
-    n_hidden_units=50,      # nombre de neurones dans la couche
-    epochs=500,             # +epochs est grand mieux est la précision mais + long est la convergence
-    learning_rate=0.0005,   # 0.0005 => 87% d'accuracy sur le test
-    n_batches=25,
-).train(X_train, y_train);
+########################################  HyperParametersStudy
 
-def plot_error(model):
-    plt.plot(range(len(model.error_)), model.error_)
-    plt.ylabel('Errors')
-    plt.xlabel('Epochs')
-    plt.show()
-
-plot_error(nn)
+#################### Neural Network study
+# HyperParameters : learning_rate/n_hidden_units/epochs/n_batches
+# On étudieras ici : n_hidden_units/n_hidden_units (/nombre de couches cachés)
 
 
-y_hat = nn.predict_proba(X_test)
-
-print('Train Accuracy: %.2f%%' % (nn.score(X_train, y_train) * 100))
-print('Test Accuracy: %.2f%%' % (nn.score(X_test, y_test) * 100))
+#################### KNN
+# HyperParameters : K
 
 
+#################### SVM
+# HyperParameters : Kernel
+
+
+#################### RN
+# HyperParameters : n_hidden_units/n_hidden_units/nombre de couches cachés
+
+
+#################### decision tree
+# HyperParameters : profondeur

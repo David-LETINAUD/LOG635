@@ -5,6 +5,7 @@ from tabulate import tabulate
 from plot_fmnist import *
 from Neural_network import *
 import pickle
+import cv2
 
 # Always run this cell to display the complete output in the cells, not just the last result.
 from IPython.core.interactiveshell import InteractiveShell
@@ -29,6 +30,11 @@ y = np.array(pickle.load( open("y.pickle", 'rb') ))
 train_ratio = 0.8
 data_size = len(y)
 training_size = int( train_ratio * data_size)
+
+# Resize pictures
+WIDTH = 14
+HEIGHT = 14
+X = np.array([cv2.resize(img, (WIDTH, HEIGHT)) for img in X])
 
 # Mise en forme des données
 X = X.reshape(len(y), X.shape[1] * X.shape[2] )/255 # Flatten the array & normalise features

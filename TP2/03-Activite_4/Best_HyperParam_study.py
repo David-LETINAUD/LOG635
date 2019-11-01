@@ -25,17 +25,6 @@ def perf_mesure(y_hat, y_test):
     rec = recall_score(y_hat, y_test, average='weighted')  
     return [acc,rec, f1]
 
-def plot_product_grid(X, y, rows, cols):
-    plt.figure(figsize=(2*rows, 2*cols))  # set the size of the figure 10 inches by 10 inches
-    for i in range(rows*cols):  # iterates over 25 images
-        plt.subplot(rows, cols, i+1)  # indicate each cell in the plot
-        plt.xticks([])  # void x axis ticks
-        plt.yticks([])  # void y axis ticks
-        plt.grid(False)
-        plt.imshow(X[i].reshape(28,28), cmap=plt.cm.binary)  # set image to display in current cell
-        plt.xlabel(class_names[y[i]])  # class to display in currente cell
-    plt.show()
-
 def plot_perf(perf, hyperParam_range, delays,title  ):
     #delays = np.array(delays).transpose(1,0)
 
@@ -61,7 +50,7 @@ def plot_perf(perf, hyperParam_range, delays,title  ):
     #axs[2].legend(['testing_delay'])
     plt.show()
 
-# Fonction inspirée de : https://scikit-learn.org/stable/auto_examples/model_selection/plot_confusion_matrix.html
+
 # Fonction inspirée de : https://scikit-learn.org/stable/auto_examples/model_selection/plot_confusion_matrix.html
 def plot_confusion_matrix(y_true, y_pred, classes,
                           normalize=True,

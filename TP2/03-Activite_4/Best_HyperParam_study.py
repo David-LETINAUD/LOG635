@@ -6,8 +6,9 @@ from plot_fmnist import *
 from Neural_network import *
 import pickle
 import cv2
-from sklearn.metrics import f1_score, accuracy_score, recall_score
+from sklearn.metrics import f1_score, accuracy_score, recall_score,confusion_matrix
 from sklearn.neighbors import KNeighborsClassifier
+from sklearn.utils.multiclass import unique_labels
 import time
 
 # Always run this cell to display the complete output in the cells, not just the last result.
@@ -36,9 +37,9 @@ def plot_product_grid(X, y, rows, cols):
     plt.show()
 
 def plot_perf(perf, hyperParam_range, delays,title  ):
-    delays = np.array(delays).transpose(1,0)
+    #delays = np.array(delays).transpose(1,0)
 
-    fig, axs = plt.subplots(1,2)
+    fig, axs = plt.subplots(1,3)
     plt.suptitle(title, fontsize=16)
     
     axs[0].title.set_text('Peformances du modèle sur dataset de test')
@@ -47,17 +48,82 @@ def plot_perf(perf, hyperParam_range, delays,title  ):
     axs[0].set_xlabel('Hyperparameter')
     axs[0].legend(['Précision', 'Rappel', 'F1_score'])
     
-    axs[1].title.set_text('Temps de calculs')
-    axs[1].plot(hyperParam_range, delays, 'x--')
+    axs[1].title.set_text('Temps d\'apprentissage')
+    axs[1].plot(hyperParam_range, delays[0], 'x--')
     axs[1].set_ylabel('Delays (s)')
     axs[1].set_xlabel('Hyperparameter')
-    axs[1].legend(['predicting_delay','testing_delay'])
+    #axs[1].legend(['predicting_delay'])
+
+    axs[2].title.set_text('Temps de prédiction')
+    axs[2].plot(hyperParam_range, delays[1], 'x--')
+    axs[2].set_ylabel('Delays (s)')
+    axs[2].set_xlabel('Hyperparameter')
+    #axs[2].legend(['testing_delay'])
     plt.show()
+
+# Fonction inspirée de : https://scikit-learn.org/stable/auto_examples/model_selection/plot_confusion_matrix.html
+# Fonction inspirée de : https://scikit-learn.org/stable/auto_examples/model_selection/plot_confusion_matrix.html
+def plot_confusion_matrix(y_true, y_pred, classes,
+                          normalize=True,
+                          title=None,
+                          cmap=plt.cm.Blues):
+    """
+    This function prints and plots the confusion matrix.
+    Normalization can be applied by setting `normalize=True`.
+    """
+    if not title:
+        if normalize:
+            title = 'Normalized confusion matrix'
+        else:
+            title = 'Confusion matrix, without normalization'
+
+    # Compute confusion matrix
+    cm = confusion_matrix(y_true, y_pred)
+    # Only use the labels that appear in the data
+    #tmp = unique_labels(y_true, y_pred)
+    #classes = classes[tmp]
+    if normalize:
+        cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
+        print("Normalized confusion matrix")
+    else:
+        print('Confusion matrix, without normalization')
+
+    print(cm)
+
+    fig, ax = plt.subplots()
+    im = ax.imshow(cm, interpolation='nearest', cmap=cmap)
+    ax.figure.colorbar(im, ax=ax)
+    # We want to show all ticks...
+    ax.set(xticks=np.arange(cm.shape[1]),
+           yticks=np.arange(cm.shape[0]),
+           # ... and label them with the respective list entries
+           xticklabels=classes, yticklabels=classes,
+           title=title,
+           ylabel='True label',
+           xlabel='Predicted label',
+           xlim = (-0.5,7.5),
+           ylim = (-0.5,7.5)
+    )
+    # Rotate the tick labels and set their alignment.
+    plt.setp(ax.get_xticklabels(), rotation=45, ha="right",
+             rotation_mode="anchor")
+
+    # Loop over data dimensions and create text annotations.
+    fmt = '.2f' if normalize else 'd'
+    thresh = cm.max() / 2.
+    for i in range(cm.shape[0]):
+        for j in range(cm.shape[1]):
+            ax.text(j, i, format(cm[i, j], fmt),
+                    ha="center", va="center",
+                    color="white" if cm[i, j] > thresh else "black")
+    fig.tight_layout()
+    plt.show()
+    return ax
 
 ########################################  Load & Data manipulations
 # Lecture X et y
-X = np.array(pickle.load( open("X.pickle", 'rb') ))
-y = np.array(pickle.load( open("y.pickle", 'rb') ))
+X = np.array(pickle.load( open("X2.pickle", 'rb') ))
+y = np.array(pickle.load( open("y2.pickle", 'rb') ))
 
 # Taille du dataset
 train_ratio = 0.8
@@ -92,97 +158,102 @@ N_CLASSES = len(class_names)
 #################### Neural Network study
 # HyperParameters : learning_rate/n_hidden_units/epochs/n_batches
 # On étudieras ici : n_hidden_units(/nombre de couches cachés)
-# training_delay_RNN = []
-# predicting_delay_RNN = []
-# perf_RNN = []
-# best_index_RNN = 0
+training_delay_RN = []
+predicting_delay_RN = []
+perf_RN = []
+best_index_RN = 0
+best_y_test_RN =  []
 
-# #l_rate_range = np.arange(0.0001,0.04,0.0005) #A garder
-# # l_rate_range = np.logspace(0.0001, 0.004, 1, endpoint=False)
-# l_rate_range = [0.000001,0.00005, 0.0005, 0.001, 0.01, 0.02, 0.03, 0.05]
-# #l_rate_range = np.arange(0.002,0.04,0.002) #A garder
-# #l_rate_range = np.arange(0.4,1,0.2)
-# cpt = 0
-# best_accuracy_RNN = 0
-# for l_rate in l_rate_range:
-#     nn = NNClassifier(
-#         n_classes=N_CLASSES, 
-#         n_features=N_FEATURES,
-#         n_hidden_units=100,     # nombre de neurones dans la couche : more is better
-#         epochs=500,             # +epochs est grand mieux est la précision mais + long est la convergence : more is better
-#         learning_rate=l_rate,   # 0.0005 => 87% d'accuracy sur le test
-#         n_batches=25,
-#     )
-#     #### Apprentissage
-#     start = time.time()
-#     nn.train(X_train, y_train)
-#     end = time.time()
-#     training_delay_RNN.append(end - start)
+#l_rate_range = np.arange(0.0001,0.04,0.0005) #A garder
+# l_rate_range = np.logspace(0.0001, 0.004, 1, endpoint=False)
+#l_rate_range = [0.000001,0.00005, 0.0005, 0.001, 0.01, 0.02, 0.03, 0.05]
+l_rate_range = [0.000001,0.00005, 0.0005, 0.001, 0.005, 0.01,0.012, 0.015, 0.02]
+#l_rate_range = np.arange(0.002,0.04,0.002) #A garder
+#l_rate_range = np.arange(0.4,1,0.2)
+cpt = 0
+best_accuracy_RN = 0
+for l_rate in l_rate_range:
+    nn = NNClassifier(
+        n_classes=N_CLASSES, 
+        n_features=N_FEATURES,
+        n_hidden_units=100,     # nombre de neurones dans la couche : more is better
+        epochs=500,             # +epochs est grand mieux est la précision mais + long est la convergence : more is better
+        learning_rate=l_rate,   # 0.0005 => 87% d'accuracy sur le test
+        n_batches=25,
+    )
+    #### Apprentissage
+    start = time.time()
+    nn.train(X_train, y_train)
+    end = time.time()
+    training_delay_RN.append(end - start)
 
-#     #### Prédiction
-#     start = time.time()
-#     y_hat = nn.predict_proba(X_test)    
-#     end = time.time()
-#     predicting_delay_RNN.append(end - start)
+    #### Prédiction
+    start = time.time()
+    y_hat = nn.predict_proba(X_test)    
+    end = time.time()
+    predicting_delay_RN.append(end - start)
 
-#     # Calcul Perfs
-#     y_hat = np.argmax(y_hat, axis = 1)  # Reshape probas vector TO number of the max proba
-#     perf = perf_mesure(y_hat, y_test)
-#     perf_RNN.append(perf)
+    # Calcul Perfs
+    y_hat = np.argmax(y_hat, axis = 1)  # Reshape probas vector TO number of the max proba
+    perf = perf_mesure(y_hat, y_test)
+    perf_RN.append(perf)
 
-#     if perf[0]> best_accuracy_RNN:
-#         best_accuracy_RNN = perf[0]
-#         best_index_RNN = cpt
-#     cpt+=1
-#     print("l_rate : ",l_rate, "perf : ", perf)
+    if perf[0]> best_accuracy_RN:
+        best_accuracy_RN = perf[0]
+        best_index_RN = cpt
+        best_y_pred_RN =  y_hat
+    cpt+=1
+    print("l_rate : ",l_rate, "perf : ", perf)
 
-# # Best Perf :
-# print("Best accuracy : {} for learning_rate = {}".format(perf_RNN[best_index_RNN][0] , l_rate_range[best_index_RNN] ) )
-# print("Learning delay : {} | predicting delay = {}".format(training_delay_RNN[best_index_RNN] , predicting_delay_RNN[best_index_RNN] ) )
+# Best Perf :
+print("Best accuracy : {} for learning_rate = {}".format(perf_RN[best_index_RN][0] , l_rate_range[best_index_RN] ) )
+print("Learning delay : {} | predicting delay = {}".format(training_delay_RN[best_index_RN] , predicting_delay_RN[best_index_RN] ) )
 
-# plot_perf(perf_RNN,l_rate_range,[training_delay_RNN,predicting_delay_RNN], "RNN : Hyperparameter = learning rate")
+plot_perf(perf_RN,l_rate_range,[training_delay_RN,predicting_delay_RN], "RN : Hyperparameter = learning rate")
+plot_confusion_matrix(y_test,best_y_pred_RN,class_names)
 
 
 #################### KNN
 # HyperParameters : K
-training_delay_KNN = []
-predicting_delay_KNN = []
-perf_KNN = []
-best_index_KNN = 0
-K_range = range(1,15,2)
-best_accuracy_KNN = 0
+# training_delay_KNN = []
+# predicting_delay_KNN = []
+# perf_KNN = []
+# best_index_KNN = 0
+# K_range = range(1,15,2)
+# best_accuracy_KNN = 0
+# best_y_pred_KNN = []
 
-cpt=0
-for k in K_range :
-    knn = KNeighborsClassifier(n_neighbors=k)
+# cpt=0
+# for k in K_range :
+#     knn = KNeighborsClassifier(n_neighbors=k)
 
-    #### Apprentissage
-    start = time.time()
-    knn.fit(X_train, y_train)
-    end = time.time()
-    training_delay_KNN.append(end-start)
+#     #### Apprentissage
+#     start = time.time()
+#     knn.fit(X_train, y_train)
+#     end = time.time()
+#     training_delay_KNN.append(end-start)
 
-    #### Prédiction
-    start = time.time()
-    y_pred = knn.predict(X_test)
-    end = time.time()
-    predicting_delay_KNN.append(end-start)
+#     #### Prédiction
+#     start = time.time()
+#     y_pred = knn.predict(X_test)
+#     end = time.time()
+#     predicting_delay_KNN.append(end-start)
 
-    perf = perf_mesure(y_pred,y_test)
-    perf_KNN.append(perf)
+#     perf = perf_mesure(y_pred,y_test)
+#     perf_KNN.append(perf)
 
-    if perf[0]> best_accuracy_KNN:
-        best_accuracy_KNN = perf[0]
-        best_index_KNN = cpt
-    cpt+=1
-    print("K : ",k, "perf : ", perf)
+#     if perf[0]> best_accuracy_KNN:
+#         best_accuracy_KNN = perf[0]
+#         best_index_KNN = cpt
+#     cpt+=1
+#     print("K : ",k, "perf : ", perf)
 
-# Best Perf :
-print("Best accuracy : {} for learning_rate = {}".format(perf_KNN[best_index_KNN][0] , K_range[best_index_KNN] ) )
-print("Learning delay : {} | predicting delay = {}".format(training_delay_KNN[best_index_KNN] , predicting_delay_KNN[best_index_KNN] ) )
+# # Best Perf :
+# print("Best accuracy : {} for learning_rate = {}".format(perf_KNN[best_index_KNN][0] , K_range[best_index_KNN] ) )
+# print("Learning delay : {} | predicting delay = {}".format(training_delay_KNN[best_index_KNN] , predicting_delay_KNN[best_index_KNN] ) )
 
-plot_perf(perf_KNN,K_range,[training_delay_KNN,predicting_delay_KNN], "KNN : Hyperparameter = K")
-
+# plot_perf(perf_KNN,K_range,[training_delay_KNN,predicting_delay_KNN], "KNN : Hyperparameter = K")
+# plot_confusion_matrix(y_test,best_y_pred_KNN,class_names)
 
 #################### SVM
 # HyperParameters : Kernel

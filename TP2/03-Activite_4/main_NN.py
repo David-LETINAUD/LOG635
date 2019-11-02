@@ -87,8 +87,8 @@ data_size = len(y)
 training_size = int( train_ratio * data_size)
 
 # Resize pictures
-WIDTH = 28
-HEIGHT = 28
+WIDTH = 14
+HEIGHT = 14
 X = np.array([cv2.resize(img, (WIDTH, HEIGHT)) for img in X])
 
 # Mise en forme des données
@@ -114,10 +114,10 @@ start = time.time()
 nn = NNClassifier(
     n_classes=N_CLASSES, 
     n_features=N_FEATURES,
-    n_hidden_units=50,     # nombre de neurones dans la couche : more is better
-    epochs=250,             # +epochs est grand mieux est la précision mais + long est la convergence : more is better
-    learning_rate=0.0005,   # 0.0005 => 87% d'accuracy sur le test
-    n_batches=25,
+    n_hidden_units=100,     # nombre de neurones dans la couche : more is better
+    epochs=500,             # +epochs est grand mieux est la précision mais + long est la convergence : more is better
+    learning_rate=0.001,   # 0.0005 => 87% d'accuracy sur le test
+    n_batches=500,
 ).train(X_train, y_train);
 
 end = time.time()

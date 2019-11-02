@@ -53,8 +53,8 @@ def plot_perf(perf, hyperParam_range, delays,title  ):
 
 ########################################  Load & Data manipulations
 # Lecture X et y
-X = np.array(pickle.load( open("X2.pickle", 'rb') ))
-y = np.array(pickle.load( open("y2.pickle", 'rb') ))
+X = np.array(pickle.load( open("X.pickle", 'rb') ))
+y = np.array(pickle.load( open("y.pickle", 'rb') ))
 
 # Taille du dataset
 data_size = len(y)

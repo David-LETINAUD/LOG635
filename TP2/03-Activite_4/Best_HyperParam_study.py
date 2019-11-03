@@ -272,12 +272,33 @@ y_pred = classifier.predict(X_test)
 
 #################### decision tree
 # HyperParameters : profondeur
+training_delay_Tree = []
+predicting_delay_Tree = []
+perf_Tree = []
+best_index_Tree = 0
+best_accuracy_Tree = 0
+best_y_pred_Tree = []
 
 clf = tree.DecisionTreeClassifier()
+
+start = time.time()
 clf = clf.fit(X_train,y_train)
+end = time.time()
+training_delay_Tree.append(end-start)
+
+start = time.time()
 Y_pred = clf.predict(X_test)
+end = time.time()
+training_delay_Tree.append(end-start)
+
+perf = perf_mesure(y_pred,y_test)
+perf_Tree.append(perf)
 
 accuracy = metrics.accuracy_score(y_test, Y_pred)
-perf = perf_mesure(y_pred, y_test)
-print("Tree perf: ", perf)
+
+# Best Perf :
 print("Tree accuracy: ", accuracy)
+print("Learning delay : {} | predicting delay = {}".format(training_delay_Tree[perf[0]] , predicting_delay_Tree[perf[0]] ) )
+
+plot_perf(perf_Tree,K_range,[training_delay_Tree,predicting_delay_Tree], "Tree : Hyperparameter = profondeur")
+plot_confusion_matrix(y_test,best_y_pred_Tree,class_names)

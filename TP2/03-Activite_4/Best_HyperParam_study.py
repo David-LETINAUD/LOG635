@@ -12,6 +12,8 @@ from sklearn.utils.multiclass import unique_labels
 import time
 from sklearn import svm
 from sklearn.neural_network import MLPClassifier
+from sklearn import tree
+import sklearn.metrics as metrics
 
 # Always run this cell to display the complete output in the cells, not just the last result.
 from IPython.core.interactiveshell import InteractiveShell
@@ -255,7 +257,8 @@ clf = svm.SVC(gamma='scale')
 clf.fit(X_train, y_train) 
 y_pred = clf.predict(X_test)
 
-perf = perf_mesure(y_pred, y_test)
+# perf = perf_mesure(y_pred, y_test)
+# print("SVM perf: ", perf)
 
 #################### RN
 # HyperParameters : n_hidden_units/n_hidden_units/nombre de couches cachés
@@ -264,8 +267,17 @@ classifier = MLPClassifier(solver='lbfgs', alpha=0.1, hidden_layer_sizes=(5, 2),
 classifier.fit(X_train, y_train) 
 y_pred = classifier.predict(X_test)
 
-perf = perf_mesure(y_pred, y_test)
-
+# perf = perf_mesure(y_pred, y_test)
+# print("RN perf: ", perf)
 
 #################### decision tree
 # HyperParameters : profondeur
+
+clf = tree.DecisionTreeClassifier()
+clf = clf.fit(X_train,y_train)
+Y_pred = clf.predict(X_test)
+
+accuracy = metrics.accuracy_score(y_test, Y_pred)
+perf = perf_mesure(y_pred, y_test)
+print("Tree perf: ", perf)
+print("Tree accuracy: ", accuracy)

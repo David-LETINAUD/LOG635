@@ -10,6 +10,8 @@ from sklearn.metrics import f1_score, accuracy_score, recall_score,confusion_mat
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.utils.multiclass import unique_labels
 import time
+from sklearn import svm
+from sklearn.neural_network import MLPClassifier
 
 # Always run this cell to display the complete output in the cells, not just the last result.
 from IPython.core.interactiveshell import InteractiveShell
@@ -249,9 +251,20 @@ plot_confusion_matrix(y_test,best_y_pred_KNN,class_names)
 #################### SVM
 # HyperParameters : Kernel
 
+clf = svm.SVC(gamma='scale')
+clf.fit(X_train, y_train) 
+y_pred = clf.predict(X_test)
+
+perf = perf_mesure(y_pred, y_test)
 
 #################### RN
 # HyperParameters : n_hidden_units/n_hidden_units/nombre de couches cachés
+
+classifier = MLPClassifier(solver='lbfgs', alpha=0.1, hidden_layer_sizes=(5, 2), random_state=1)
+classifier.fit(X_train, y_train) 
+y_pred = classifier.predict(X_test)
+
+perf = perf_mesure(y_pred, y_test)
 
 
 #################### decision tree

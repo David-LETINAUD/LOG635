@@ -252,23 +252,61 @@ plot_confusion_matrix(y_test,best_y_pred_KNN,class_names)
 
 #################### SVM
 # HyperParameters : Kernel
+training_delay_svm = []
+predicting_delay_svm = []
+perf_svm = []
+best_index_svm = 0
 
-clf = svm.SVC(gamma='scale')
-clf.fit(X_train, y_train) 
-y_pred = clf.predict(X_test)
+clf_svm = svm.SVC(gamma='scale')
 
-# perf = perf_mesure(y_pred, y_test)
-# print("SVM perf: ", perf)
+start = time.time()
+clf_svm.fit(X_train, y_train) 
+end = time.time()
+training_delay_svm.append(end-start)
+
+start = time.time()
+y_pred = clf_svm.predict(X_test)
+end = time.time()
+predicting_delay_svm.append(end-start)
+
+perf = perf_mesure(y_pred,y_test)
+perf_svm.append(perf)
+
+# Best Perf :
+print("Best accuracy : {} for learning_rate = {}".format(perf_svm[best_index_svm][0] , K_range[best_index_svm] ) )
+print("Learning delay : {} | predicting delay = {}".format(training_delay_svm[best_index_svm] , predicting_delay_svm[best_index_svm] ) )
+
+plot_perf(perf_svm,range(1,2),[training_delay_svm,predicting_delay_svm], "SVM: Hyperparameter: Kernel?")
+plot_confusion_matrix(y_test,y_pred,class_names)
 
 #################### RN
 # HyperParameters : n_hidden_units/n_hidden_units/nombre de couches cachés
+training_delay_rn = []
+predicting_delay_rn = []
+perf_rn = []
+best_index_rn = 0
+best_accuracy_rn = 0
 
 classifier = MLPClassifier(solver='lbfgs', alpha=0.1, hidden_layer_sizes=(5, 2), random_state=1)
-classifier.fit(X_train, y_train) 
-y_pred = classifier.predict(X_test)
 
-# perf = perf_mesure(y_pred, y_test)
-# print("RN perf: ", perf)
+start = time.time()
+classifier.fit(X_train, y_train) 
+end = time.time()
+training_delay_rn.append(end-start)
+
+start = time.time()
+y_pred = classifier.predict(X_test)
+end = time.time()
+predicting_delay_rn.append(end-start)
+
+perf = perf_mesure(y_pred,y_test)
+perf_rn.append(perf)
+
+print("Best accuracy : {} for learning_rate = {}".format(perf_rn[best_index_rn][0] , K_range[best_index_rn] ) )
+print("Learning delay : {} | predicting delay = {}".format(training_delay_rn[best_index_rn] , predicting_delay_rn[best_index_rn] ) )
+
+plot_perf(perf_rn,range(1,2),[training_delay_rn,predicting_delay_rn], "RN: Hyperparameter = ")
+plot_confusion_matrix(y_test,y_pred,class_names)
 
 #################### decision tree
 # HyperParameters : profondeur
@@ -289,7 +327,7 @@ training_delay_Tree.append(end-start)
 start = time.time()
 Y_pred = clf.predict(X_test)
 end = time.time()
-training_delay_Tree.append(end-start)
+predicting_delay_Tree.append(end-start)
 
 perf = perf_mesure(y_pred,y_test)
 perf_Tree.append(perf)
@@ -298,7 +336,7 @@ accuracy = metrics.accuracy_score(y_test, Y_pred)
 
 # Best Perf :
 print("Tree accuracy: ", accuracy)
-print("Learning delay : {} | predicting delay = {}".format(training_delay_Tree[perf[0]] , predicting_delay_Tree[perf[0]] ) )
+print("Learning delay : {} | predicting delay = {}".format(training_delay_Tree[0] , predicting_delay_Tree[0] ) )
 
-plot_perf(perf_Tree,K_range,[training_delay_Tree,predicting_delay_Tree], "Tree : Hyperparameter = profondeur")
-plot_confusion_matrix(y_test,best_y_pred_Tree,class_names)
+plot_perf(perf_Tree,range(1,2),[training_delay_Tree,predicting_delay_Tree], "Tree : Hyperparameter = profondeur")
+plot_confusion_matrix(y_test,y_pred,class_names)

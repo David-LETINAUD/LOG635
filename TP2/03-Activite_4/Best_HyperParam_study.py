@@ -280,14 +280,14 @@ plot_perf(perf_svm,range(1,2),[training_delay_svm,predicting_delay_svm], "SVM: H
 plot_confusion_matrix(y_test,y_pred,class_names)
 
 #################### RN
-# HyperParameters : n_hidden_units/n_hidden_units/nombre de couches cachés
+# HyperParameters : n_hidden_units/nombre de couches cachés
 training_delay_rn = []
 predicting_delay_rn = []
 perf_rn = []
 best_index_rn = 0
 best_accuracy_rn = 0
 
-classifier = MLPClassifier(solver='lbfgs', alpha=0.1, hidden_layer_sizes=(5, 2), random_state=1)
+classifier = MLPClassifier(solver='lbfgs', learning_rate_init=0.01, hidden_layer_sizes=(30,), random_state=1)
 
 start = time.time()
 classifier.fit(X_train, y_train) 

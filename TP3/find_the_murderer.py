@@ -1,6 +1,8 @@
 import cozmo
+from cozmo.util import degrees,Pose
 from inference_class import *
-from Map import create_walls
+from Map import create_walls, position, create_positions,launch_all
+
 
 # Parcours fixe mais objet diff dans chaque 
 # trouve un mqrqueyr => quel est l'objet 
@@ -26,103 +28,123 @@ for fact in facts:
 
 
 
+def reaction_piece_1():
+    # On se rend compte que Scarlet est morte par étranglement
+    fact = ['Scarlet a des marques au cou']
+    agent.add_clause(to_fol(fact, 'grammars/personne_marque.fcfg'))
+    fact = ['Scarlet est dans le bureau']
+    agent.add_clause(to_fol(fact, 'grammars/personne_piece.fcfg'))
 
-# On se rend compte que Scarlet est morte par étranglement
-fact = ['Scarlet a des marques au cou']
-agent.add_clause(to_fol(fact, 'grammars/personne_marque.fcfg'))
+    # On sait que Peacock est dans le bureau
+    fact = ['Peacock est dans le bureau']
+    agent.add_clause(to_fol(fact, 'grammars/personne_piece.fcfg'))
 
-fact = ['Scarlet est dans le bureau']
-agent.add_clause(to_fol(fact, 'grammars/personne_piece.fcfg'))
+    # Demande à Peacock l'heure du decès -> Rep : 14h
+    fact = ['Scarlet est morte à 14h']
+    agent.add_clause(to_fol(fact, 'grammars/personne_morte_heure.fcfg'))
 
-# On sait que Peacock est dans le bureau
-fact = ['Peacock est dans le bureau']
-agent.add_clause(to_fol(fact, 'grammars/personne_piece.fcfg'))
+    uneHeureApres = agent.get_crime_hour() + 1
 
-# Demande à Peacock l'heure du decès -> Rep : 14h
-fact = ['Scarlet est morte à 14h']
-agent.add_clause(to_fol(fact, 'grammars/personne_morte_heure.fcfg'))
+    agent.add_clause('UneHeureApresCrime({})'.format(uneHeureApres))
 
-uneHeureApres = agent.get_crime_hour() + 1
-
-agent.add_clause('UneHeureApresCrime({})'.format(uneHeureApres))
-
-# Demande à Peacock dans quelle pièce il était une heure après le meurtre -> Rep : Peacock dans le Salon à 15h
-fact = ['Peacock était dans le salon à ' + str(uneHeureApres) + 'h']
-agent.add_clause(to_fol(fact, 'grammars/personne_piece_heure.fcfg'))
-
+    # Demande à Peacock dans quelle pièce il était une heure après le meurtre -> Rep : Peacock dans le Salon à 15h
+    fact = ['Peacock était dans le salon à ' + str(uneHeureApres) + 'h']
+    agent.add_clause(to_fol(fact, 'grammars/personne_piece_heure.fcfg'))
 
 
 
 
+def reaction_piece_2():
+    # Dans le salon
+    # Voit qu'il y a un fusil et Plum dans le salon
+    fact = ['Le fusil est dans le salon']
+    agent.add_clause(to_fol(fact, 'grammars/arme_piece.fcfg'))
+    fact = ['Plum est dans le salon']
+    agent.add_clause(to_fol(fact, 'grammars/personne_piece.fcfg'))
 
-# Dans le salon
+    uneHeureApres = agent.get_crime_hour() + 1
 
-# Voit qu'il y a un fusil et Plum dans le salon
-fact = ['Le fusil est dans le salon']
-agent.add_clause(to_fol(fact, 'grammars/arme_piece.fcfg'))
-
-fact = ['Plum est dans le salon']
-agent.add_clause(to_fol(fact, 'grammars/personne_piece.fcfg'))
-
-# Demande à Plum dans quelle pièce il était une heure après le meurtre -> Rep : Plum dans le Salon à 15h
-fact = ['Plum était dans le salon à ' + str(uneHeureApres) + 'h']
-agent.add_clause(to_fol(fact, 'grammars/personne_piece_heure.fcfg'))
-
-
+    # Demande à Plum dans quelle pièce il était une heure après le meurtre -> Rep : Plum dans le Salon à 15h
+    fact = ['Plum était dans le salon à ' + str(uneHeureApres) + 'h']
+    agent.add_clause(to_fol(fact, 'grammars/personne_piece_heure.fcfg'))
 
 
 
 
-# Dans la cuisine
+def reaction_piece_3():
+    # Dans la cuisine
+    # Voit qu'il y a un couteau, White et Mustard dans la cuisine
+    fact = ['Le couteau est dans la cuisine']
+    agent.add_clause(to_fol(fact, 'grammars/arme_piece.fcfg'))
+    fact = ['White est dans la cuisine']
+    agent.add_clause(to_fol(fact, 'grammars/personne_piece.fcfg'))
+    fact = ['Mustard est dans la cuisine']
+    agent.add_clause(to_fol(fact, 'grammars/personne_piece.fcfg'))
 
-# Voit qu'il y a un couteau, White et Mustard dans la cuisine
-fact = ['Le couteau est dans la cuisine']
-agent.add_clause(to_fol(fact, 'grammars/arme_piece.fcfg'))
+    uneHeureApres = agent.get_crime_hour() + 1
 
-fact = ['White est dans la cuisine']
-agent.add_clause(to_fol(fact, 'grammars/personne_piece.fcfg'))
+    # Demande à White dans quelle pièce il était une heure après le meurtre -> Rep : White dans la Cuisine à 15h
+    fact = ['White était dans la cuisine à ' + str(uneHeureApres) + 'h']
+    agent.add_clause(to_fol(fact, 'grammars/personne_piece_heure.fcfg'))
 
-fact = ['Mustard est dans la cuisine']
-agent.add_clause(to_fol(fact, 'grammars/personne_piece.fcfg'))
-
-# Demande à White dans quelle pièce il était une heure après le meurtre -> Rep : White dans la Cuisine à 15h
-fact = ['White était dans la cuisine à ' + str(uneHeureApres) + 'h']
-agent.add_clause(to_fol(fact, 'grammars/personne_piece_heure.fcfg'))
-
-# Demande à Mustard dans quelle pièce il était une heure après le meurtre -> Rep : Mustard dans le Garage à 15h
-fact = ['Mustard était dans le garage à ' + str(uneHeureApres) + 'h']
-agent.add_clause(to_fol(fact, 'grammars/personne_piece_heure.fcfg'))
-
-
-# Dans le garage
-# On se rend compte qu'il y a une corde dans le garage
-fact = ['La corde est dans le garage']
-agent.add_clause(to_fol(fact, 'grammars/arme_piece.fcfg'))
+    # Demande à Mustard dans quelle pièce il était une heure après le meurtre -> Rep : Mustard dans le Garage à 15h
+    fact = ['Mustard était dans le garage à ' + str(uneHeureApres) + 'h']
+    agent.add_clause(to_fol(fact, 'grammars/personne_piece_heure.fcfg'))
 
 
-# Conclusions
-print("Pièce du crime : ", agent.get_crime_room())
-print("Arme du crime : ", agent.get_crime_weapon())
-print("Personne victime : ", agent.get_victim())
-print("Heure du crime : ", agent.get_crime_hour())
-print("Meurtrier : ", agent.get_suspect())
-print("Personnes innocentes : ", agent.get_innocent())
+def reaction_piece_4():
+    # Dans le garage
+    # On se rend compte qu'il y a une corde dans le garage
+    fact = ['La corde est dans le garage']
+    agent.add_clause(to_fol(fact, 'grammars/arme_piece.fcfg'))
 
 
+
+
+def Conclusions():
+    # Conclusions
+    print("Pièce du crime : ", agent.get_crime_room())
+    print("Arme du crime : ", agent.get_crime_weapon())
+    print("Personne victime : ", agent.get_victim())
+    print("Heure du crime : ", agent.get_crime_hour())
+    print("Meurtrier : ", agent.get_suspect())
+    print("Personnes innocentes : ", agent.get_innocent())
+
+
+
+
+function_tab = []
+function_tab.append(reaction_piece_1)
+function_tab.append(reaction_piece_2)
+function_tab.append(reaction_piece_3)
+function_tab.append(reaction_piece_4)
 
 
 ############# COZMO PROGRAM
 def cozmo_program(robot: cozmo.robot.Robot):
     robot.world.delete_all_custom_objects()
-    print(robot.pose.position)
-    create_walls(robot)
-    for s in stop :
-        robot.go_to_pose(s, relative_to_robot=False).wait_for_completed()
-        robot.say_text("Où suis je ?", True, in_parallel=True, duration_scalar=0.5,use_cozmo_voice=True).wait_for_completed() 
-        piece = input("entrez nom de la pièce")
-        robot.say_text("je suis à" + piece, True, in_parallel=True, duration_scalar=0.5,use_cozmo_voice=True).wait_for_completed() 
+    #create_walls(robot)
+
+
+    position_tab = create_positions(robot,function_tab)
+    launch_all(position_tab)
+
+    Conclusions()
+
+    # for s in stop :
+    #     robot.go_to_pose(s, relative_to_robot=False).wait_for_completed()
+    #     robot.say_text("Où suis je ?", True, in_parallel=True, duration_scalar=0.5,use_cozmo_voice=True).wait_for_completed() 
+    #     piece = input("entrez nom de la pièce")
+    #     robot.say_text("je suis à" + piece, True, in_parallel=True, duration_scalar=0.5,use_cozmo_voice=True).wait_for_completed() 
 
 
 
 cozmo.run_program(cozmo_program, use_3d_viewer=True, use_viewer=True)
+
+
+# Associer chaque cube_ID à une fonction (victime/buzzer/meurtrier)
+# Associer une position à chaque une action
+# Pour chaque position
+# 
+#
 

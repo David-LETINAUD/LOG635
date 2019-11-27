@@ -17,4 +17,7 @@ def cozmo_program(robot: cozmo.robot.Robot):
         print(f"Postion (x_y_z):{cube.pose.position.x_y_z}")
         robot.go_to_object(cube, distance_mm(40)).wait_for_completed()
 
+        cube.object_type
+        
+
 cozmo.run_program(cozmo_program, use_3d_viewer=True, use_viewer=True)

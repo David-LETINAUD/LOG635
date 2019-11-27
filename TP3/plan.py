@@ -1,5 +1,6 @@
 import cozmo
 from cozmo.util import degrees,Pose
+from TutoCubes.cubes_position import *
 
 WALL_HEIGHT = 50
 WALL_WIDTH = 10
@@ -62,4 +63,7 @@ def cozmo_program(robot: cozmo.robot.Robot):
        # robot.say_text("Où suis je ?", True, in_parallel=True, duration_scalar=0.5,use_cozmo_voice=True).wait_for_completed() 
        # piece = input("entrez nom de la pièce")
        # robot.say_text("je suis à" + piece, True, in_parallel=True, duration_scalar=0.5,use_cozmo_voice=True).wait_for_completed() 
-cozmo.run_program(cozmo_program, use_3d_viewer=True, use_viewer=True)
+
+cube =cubes_position(cozmo_program)
+robot.go_to_pose(cube.pose, relative_to_robot=False).wait_for_completed()
+#cozmo.run_program(cozmo_program, use_3d_viewer=True, use_viewer=True)

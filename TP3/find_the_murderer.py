@@ -123,7 +123,8 @@ fact = ['{} est dans le {}'.format(agent.get_victim(), piece)]
 agent.add_clause(to_fol(fact, 'grammars/personne_piece.fcfg'))
 
 # Comment est-elle morte?
-fact = ['{} a des marques de couteau'.format(agent.get_victim())]
+#fact = ['{} est criblée de balles'.format(agent.get_victim())]
+fact = ['{} est atteinte par balle'.format(agent.get_victim())]
 agent.add_clause(to_fol(fact, 'grammars/personne_marque.fcfg'))
 
 # Demande à Peacock l'heure du decès -> Rep : 14h

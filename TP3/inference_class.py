@@ -76,6 +76,7 @@ class CrimeInference:
         # p. ex.: Mustard a des marques au cou
         self.body_mark_clause = 'MarqueCouteau({})'
         self.body_mark_clause = 'MarqueCou({})'
+        self.body_mark_clause = 'MarqueFusil({})'
 
         # paramètre 1 : piece; paramètre 2 : piece
         self.room_different_clause = 'PieceDifferente({},{})'
@@ -126,6 +127,7 @@ class CrimeInference:
         self.clauses.append(expr('PieceCrime(x) & Arme(y) & Piece_Arme(y, x) ==> ArmeCrime(y)'))
         self.clauses.append(expr("EstMort(x) & MarqueCouteau(x) ==> ArmeCrime(Couteau)"))
         self.clauses.append(expr("EstMort(x) & MarqueCou(x) ==> ArmeCrime(Corde)"))
+        self.clauses.append(expr("EstMort(x) & MarqueFusil(x) ==> ArmeCrime(Fusil)"))
 
         # Si la personne est morte alors elle est la victime et ce n'est pas un suicide
         self.clauses.append(expr('EstMort(x) ==> Victime(x)'))

@@ -138,7 +138,7 @@ agent.add_clause('UneHeureApresCrime({})'.format(15))
 fact = ['Mustard était dans le garage à ' + str(15) + 'h']
 agent.add_clause(to_fol(fact, 'grammars/personne_piece_heure.fcfg'))
 
-fact = ['Le couteau est dans le garage']
+fact = ['Le fusil est dans le garage']
 agent.add_clause(to_fol(fact, 'grammars/arme_piece.fcfg'))
 
 

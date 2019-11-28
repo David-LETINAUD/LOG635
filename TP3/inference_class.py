@@ -146,6 +146,7 @@ class CrimeInference:
         self.clauses.append(expr(
             'EstVivant(p) & UneHeureApresCrime(h1) & Personne_Piece_Heure(p,r2,h1) & PieceCrime(r1)'
             ' & PieceDifferente(r1,r2) & ArmeCrime(a) & Arme_Piece(a,r2) ==> Suspect(p)'))
+        
 
     # Ajouter des clauses, c'est-à-dire des faits, à la base de connaissances
     def add_clause(self, clause_string):

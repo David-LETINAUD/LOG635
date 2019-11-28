@@ -59,10 +59,11 @@ pose_tab.append(Pose(330, 90, 0, angle_z=degrees(0)))
 cpt = 0
 class position:
 
-    def __init__(self, robot : cozmo.robot.Robot, p: Pose, f):
+    def __init__(self, robot : cozmo.robot.Robot, p: Pose, f, n=""):
         self.robot = robot
         self.pose = p
         self.function = f
+        self.name = n
         
 
     def action(self):
@@ -74,12 +75,12 @@ class position:
         self.robot.go_to_pose(self.pose, relative_to_robot=False, in_parallel=False, num_retries=1).wait_for_completed(timeout=None)
         #time.sleep(5)
         print("POSE OK : NOW function****************")
-        self.function()
+        self.function(self.robot)
         cpt+=1
 
 
 
-def create_positions(robot, function_tab):
+def create_positions(robot: cozmo.robot.Robot, function_tab):
     position_tab = []
     pose_tab = []
 

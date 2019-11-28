@@ -1,18 +1,23 @@
 import time
 import cozmo
 
-cube_taps = [0]*3
+cube_taps = 0 #[0]*3
 
 def handle_object_tapped(evt, **kw):
     global keepGoing
+    global cube_taps 
     # This will be called whenever an EvtObjectMovingStarted event is dispatched -
     # whenever we detect a cube starts moving (via an accelerometer in the cube)
-    i = evt.obj.object_id - 1
-    cube_taps[i] = cube_taps[i] + evt.tap_count if cube_taps[i] < 3 else 0
-    print(cube_taps)
-    
-    if all(x == 3 for x in cube_taps):
-        keepGoing=False
+    if evt.obj.object_id ==3 :
+        cube_taps = cube_taps + evt.tap_count if cube_taps<3 else 0
+        print(cube_taps)
+    # i = evt.obj.object_id - 1
+    # cube_taps[i] = cube_taps[i] + evt.tap_count if cube_taps[i] < 3 else 0
+    # print(cube_taps)
+        # if cube_taps == 3:
+        #     keepGoing=False
+    # if all(x == 3 for x in cube_taps):
+    #     keepGoing=False
 
 def cozmo_program(robot: cozmo.robot.Robot):
     global keepGoing
@@ -28,4 +33,4 @@ def cozmo_program(robot: cozmo.robot.Robot):
         
     robot.say_text("cube Tapped").wait_for_completed()
 
-cozmo.run_program(cozmo_program)
+#cozmo.run_program(cozmo_program)

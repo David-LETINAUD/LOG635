@@ -11,8 +11,8 @@ def handle_object_tapped(evt, **kw):
     #print(evt.obj.object_id)
     # This will be called whenever an EvtObjectMovingStarted event is dispatched -
     # whenever we detect a cube starts moving (via an accelerometer in the cube)
-    if evt.obj.object_id ==2 :
-        cube_taps = cube_taps + evt.tap_count if cube_taps<3 else 0
+    if evt.obj.object_id ==1:
+        cube_taps = cube_taps + evt.tap_count if cube_taps<2 else 0
         print(cube_taps)
 
 # Parcours fixe mais objet diff dans chaque 
@@ -26,6 +26,8 @@ alive_people = ['Mustard','Peacock', 'Plum', 'White']
 for a_p in alive_people:    
     agent.add_clause(to_fol(["{} est vivant".format(a_p)], 'grammars/personne_vivant.fcfg'))
 
+def Filter(string, substr): 
+    return [s for s in string if s not in substr]
 
 def reaction_piece_1(robot: cozmo.robot.Robot):
     # On se rend compte que Scarlet est morte par étranglement
@@ -94,18 +96,19 @@ def reaction_piece_4(robot: cozmo.robot.Robot):
 
 
 
-function_tab = []
-function_tab.append(reaction_piece_1)
-function_tab.append(reaction_piece_2)
-function_tab.append(reaction_piece_3)
-function_tab.append(reaction_piece_4)
+# function_tab = []
+# function_tab.append(reaction_piece_1)
+# function_tab.append(reaction_piece_2)
+# function_tab.append(reaction_piece_3)
+# function_tab.append(reaction_piece_4)
 
 
 def analyse_victime(robot):
     global cube_taps
     # Va vers la victime
-    potential_victime = list(set(agent.persons)-set(alive_people))[0]
+    potential_victime = Filter(agent.persons,alive_people)[0]
     robot.say_text("Est ce que {} est la victime?".format(potential_victime)).wait_for_completed()
+    cube_taps=0
     print("En attente d'une réponse oui/non\n")
     time.sleep(3)
     if cube_taps == 1:
@@ -134,63 +137,84 @@ def analyse_victime(robot):
 
     agent.add_clause('UneHeureApresCrime({})'.format(int(hour)+1))
 
-def suspect_1(robot):
+def indice_1(robot):
     hour_plus_one = agent.get_crime_hour_plus_one()
+    if hour_plus_one<12:
+        part_of_day = "ce matin"
+    elif hour_plus_one <18:
+        part_of_day = "cette après midi"
+    else :
+        part_of_day = "ce soir"
 
-    robot.say_text("Qui êtes vous?").wait_for_completed()
+    # Voit un couteau
+    fact = ['Le couteau est dans la cuisine']
+    robot.say_text("Je vois un couteau dans la cuisine").wait_for_completed()
+    agent.add_clause(to_fol(fact, 'grammars/arme_piece.fcfg'))
+
+    robot.say_text("Qui s'est occupé de la cuisine {}?".format(part_of_day)).wait_for_completed()
     str_in = input("Entrez son nom\n")
     name = str_in.split(' ')[-1] # quelque soit la phrase, le nom se trouve en dernier
 
     fact = ['{} était dans la cuisine à '.format(name) + str(hour_plus_one) + 'h']
     agent.add_clause(to_fol(fact, 'grammars/personne_piece_heure.fcfg'))
-
-    # Voit un couteau
-    fact = ['Le couteau est dans la cuisine']
-    robot.say_text(fact[0]).wait_for_completed()
-    agent.add_clause(to_fol(fact, 'grammars/arme_piece.fcfg'))
-
+    fact = ['{} était dans la cuisine'.format(name)]
+    agent.add_clause(to_fol(fact, 'grammars/personne_piece.fcfg'))
+  
     return 0
-def suspect_2(robot):
+
+def indice_2(robot):
     hour_plus_one = agent.get_crime_hour_plus_one()
+    if hour_plus_one<12:
+        part_of_day = "ce matin"
+    elif hour_plus_one <18:
+        part_of_day = "cette après midi"
+    else :
+        part_of_day = "ce soir"
 
     robot.say_text("Je vois une corde dans le garage").wait_for_completed()
     fact = ['Le corde est dans la garage']
     agent.add_clause(to_fol(fact, 'grammars/arme_piece.fcfg'))
 
-    robot.say_text("Qui êtes vous?").wait_for_completed()
+    robot.say_text("Qui est allé dans le garage {}?".format(part_of_day)).wait_for_completed()
     str_in = input("Entrez son nom\n")
     name = str_in.split(' ')[-1] # quelque soit la phrase, le nom se trouve en dernier
 
     fact = ['{} était dans le garage à '.format(name) + str(hour_plus_one) + 'h']
     agent.add_clause(to_fol(fact, 'grammars/personne_piece_heure.fcfg'))
+    fact = ['{} était dans le garage'.format(name) ]
+    agent.add_clause(to_fol(fact, 'grammars/personne_piece.fcfg'))
 
     return 0
 
-def suspect_3(robot):
+def indice_3(robot):
     global cube_taps
     hour_plus_one = agent.get_crime_hour_plus_one()
     potential_arme = agent.get_crime_weapon()
-    # Demande à Mustard dans quelle pièce il était une heure après le meurtre -> Rep : Mustard dans le Garage à 15h
-    robot.say_text("Qui êtes vous?").wait_for_completed()
-    str_in = input("Entrez son nom\n")
-    name = str_in.split(' ')[-1] # quelque soit la phrase, le nom se trouve en dernier
-
-    robot.say_text("Où étiez vous à {} heure?".format(hour_plus_one)).wait_for_completed()
-    str_in = input("Entrez la pièce\n")
-    piece = str_in.split(' ')[-1] # quelque soit la phrase, la piece se trouve en dernier
 
 
-    fact = ['{} était dans le {} à '.format(name,piece) + str(hour_plus_one) + 'h']
-    agent.add_clause(to_fol(fact, 'grammars/personne_piece_heure.fcfg'))
-
+    suspects = Filter(agent.persons, agent.get_innocent())
     # C'est un fusil que je voit ici?
-    robot.say_text("C'est votre {} que je vois?".format(potential_arme)).wait_for_completed()
+    robot.say_text("Je vois l'arme du crime.".format(potential_arme)).wait_for_completed()
+
+    cube_taps=0
+    robot.say_text("Ce doite être le fusil de {} ?".format(suspects[0])).wait_for_completed()
     print("En attente d'une réponse oui/non\n")
     time.sleep(3)
     if cube_taps == 1:
-        agent.add_clause(to_fol(["Le {} est dans le {}".format(potential_arme,piece)], 'grammars/arme_piece.fcfg'))
-
+        # agent.add_clause(to_fol(["Le {} est dans le {}".format(potential_arme,piece)], 'grammars/arme_piece.fcfg'))
+        suspect = suspects[0]
+    else :
+        robot.say_text("Alors c'est celui de {} ?".format(suspects[1])).wait_for_completed()
+        suspect = suspects[1]
     cube_taps=0
+
+    robot.say_text("Où été {} à {} heure?".format(suspect, hour_plus_one)).wait_for_completed()
+    str_in = input("Entrez la pièce\n")
+    piece = str_in.split(' ')[-1] # quelque soit la phrase, la piece se trouve en dernier
+    agent.add_clause(to_fol(["Le {} est dans le {}".format(potential_arme,piece)], 'grammars/arme_piece.fcfg'))
+
+    fact = ['{} était dans le {} à '.format(suspect,piece) + str(hour_plus_one) + 'h']
+    agent.add_clause(to_fol(fact, 'grammars/personne_piece_heure.fcfg'))
     
 
 def Conclusions():
@@ -200,7 +224,8 @@ def Conclusions():
     print("Personne victime : ", agent.get_victim())
     print("Heure du crime : ", agent.get_crime_hour())
     print("Meurtrier : ", agent.get_suspect())
-    print("Personnes innocentes : ", agent.get_innocent())
+    print("Personnes innocentes : ", agent.get_innocent()) 
+
 
 ############# COZMO PROGRAM
 def cozmo_program(robot: cozmo.robot.Robot):
@@ -208,12 +233,10 @@ def cozmo_program(robot: cozmo.robot.Robot):
     robot.add_event_handler(cozmo.objects.EvtObjectTapped, handle_object_tapped)
 
     analyse_victime(robot)
-    suspect_1(robot)
-    suspect_2(robot)
-    suspect_3(robot)
+    indice_1(robot)
+    indice_2(robot)
+    indice_3(robot)
     Conclusions()
-
-
 
     #create_walls(robot)
 
@@ -231,7 +254,7 @@ def cozmo_program(robot: cozmo.robot.Robot):
 
 
 
-# cozmo.run_program(cozmo_program, use_3d_viewer=True, use_viewer=True)
+cozmo.run_program(cozmo_program, use_3d_viewer=True, use_viewer=True)
 
 
 # Associer chaque cube_ID à une fonction (victime/buzzer/meurtrier)
@@ -239,4 +262,5 @@ def cozmo_program(robot: cozmo.robot.Robot):
 # Pour chaque position
 # 
 #
+
 

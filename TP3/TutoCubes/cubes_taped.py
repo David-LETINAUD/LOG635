@@ -8,7 +8,7 @@ def handle_object_tapped(evt, **kw):
     global cube_taps 
     # This will be called whenever an EvtObjectMovingStarted event is dispatched -
     # whenever we detect a cube starts moving (via an accelerometer in the cube)
-    if evt.obj.object_id ==3 :
+    if evt.obj.object_id ==2 :
         cube_taps = cube_taps + evt.tap_count if cube_taps<3 else 0
         print(cube_taps)
     # i = evt.obj.object_id - 1

@@ -6,7 +6,8 @@ import os
 
 import cozmo
 from cozmo.objects import CustomObject, CustomObjectMarkers, CustomObjectTypes, ObservableElement, ObservableObject
-from cozmo.util import Pose,degrees,distance_mm
+from cozmo.objects import LightCube1Id, LightCube2Id, LightCube3Id
+from cozmo.util import Pose,degrees,distance_mm, speed_mmps
 from avoid_collision import custom_object_pose
 
 from find_the_murderer import *
@@ -15,7 +16,7 @@ from find_the_murderer import *
 # Chemin dans l'ordre (numéro correspond au numéro du CustomTypeXX)
 Cust_obj_path = [4,5,6]#,3],4,5,6,7,8,9,10,11] 
 # Fonctions cubes et fonctions associés aux objets
-Function_path = [analyse_victime,suspect_1,suspect_2,suspect_3]
+Function_path = [analyse_victime,indice_1,indice_2,indice_3]
 
 # stocke les objets détectés
 Obj_detect = []
@@ -24,6 +25,7 @@ Cust_type_detect = []
 
 # Nombre de custom_object observable par Cozmo
 #max_cust_obj = 4
+
 
 def handle_object_appeared(evt, **kw):   
     global Cust_type_detect
@@ -71,8 +73,8 @@ def custom_objects(robot: cozmo.robot.Robot):
                    #'robot.world.define_custom_cube(CustomObjectTypes.CustomType03,CustomObjectMarkers.Circles5,60, 24.19, 24.19, True)',
                    'robot.world.define_custom_cube(CustomObjectTypes.CustomType04,CustomObjectMarkers.Diamonds2,60, 24.19, 24.19, True)',
                    'robot.world.define_custom_cube(CustomObjectTypes.CustomType05,CustomObjectMarkers.Diamonds3,60, 24.19, 24.19, True)'
-                   #,
-#                   'robot.world.define_custom_cube(CustomObjectTypes.CustomType06,CustomObjectMarkers.Diamonds4,60, 24.19, 24.19, True)'
+                   ,
+                  'robot.world.define_custom_cube(CustomObjectTypes.CustomType06,CustomObjectMarkers.Diamonds4,60, 24.19, 24.19, True)'
                    #,
                 #   'robot.world.define_custom_cube(CustomObjectTypes.CustomType07,CustomObjectMarkers.Diamonds5,60, 24.19, 24.19, True)',
                 #    'robot.world.define_custom_cube(CustomObjectTypes.CustomType08,CustomObjectMarkers.Hexagons2,60, 24.19, 24.19, True)',
@@ -80,28 +82,41 @@ def custom_objects(robot: cozmo.robot.Robot):
                 #    'robot.world.define_custom_cube(CustomObjectTypes.CustomType10,CustomObjectMarkers.Hexagons4,60, 24.19, 24.19, True)',
                 #    'robot.world.define_custom_cube(CustomObjectTypes.CustomType11,CustomObjectMarkers.Hexagons5,60, 24.19, 24.19, True)'
 ]
+    # Sauvegarde de la position initiale du robot
+    initial_pose = robot.pose
 
     # Seul les 4 premiers objets sont détectables
     for cust_cube in path_object: #[0:max_cust_obj]:
         eval(cust_cube)
 
-    # Sauvegarde de la position initiale du robot
-    initial_pose = robot.pose
 
-    # Recherche les cubes
     lookaround = robot.start_behavior(cozmo.behavior.BehaviorTypes.LookAroundInPlace)
-    cubes = robot.world.wait_until_observe_num_objects(num=3, object_type=cozmo.objects.LightCube, timeout=60)
+    cubes = robot.world.wait_until_observe_num_objects(num=2, object_type=cozmo.objects.LightCube, timeout=60)
     lookaround.stop()
 
-    # Aller au cube correspondant à la victime
-    for cube in cubes:
-        if cube.cube_id == 1:
-            robot.go_to_object(cube, distance_mm(40)).wait_for_completed()
-            #Actions
-            Function_path[0](robot)
-            Function_path.pop(0)  
 
-    #robot.go_to_pose(initial_pose, relative_to_robot=False).wait_for_completed() 
+    # Recherche les cubes
+    # get cube 1
+    cube1 = robot.world.get_light_cube(LightCube1Id)
+    # get cube 3
+    cube3 = robot.world.get_light_cube(LightCube3Id)
+
+    # for cube in cubes:
+    #     if cube.object_id == 1:
+    #cube = robot.world.get_light_cube(1)
+    # Aller au cube correspondant à la victime
+    robot.go_to_object(cube1, distance_mm(60)).wait_for_completed()
+    print(cube1.pose)
+    print(cube3.pose)
+    #robot.go_to_pose(cube1.pose, relative_to_robot=False).wait_for_completed() 
+    #Actions
+    Function_path[0](robot)
+    Function_path.pop(0)
+
+    
+    
+
+    robot.go_to_pose(initial_pose, relative_to_robot=False).wait_for_completed() 
 
     # Faire toutes les autres actions associés aux marqueurs
     while len(Cust_obj_path)!=0 :
@@ -129,7 +144,7 @@ def custom_objects(robot: cozmo.robot.Robot):
             Function_path[0](robot)
 
             # Retourner à la position initiale 
-            #robot.go_to_pose(initial_pose, relative_to_robot=False).wait_for_completed()     
+            robot.go_to_pose(initial_pose, relative_to_robot=False).wait_for_completed()     
             Cust_obj_path.pop(0) # POP le 1er élément des listes FIFO
             Function_path.pop(0)                    
             path_object.pop(0) # Ne pas redétecter les objets sur lequel on est déjà passé
@@ -144,4 +159,22 @@ def custom_objects(robot: cozmo.robot.Robot):
             if len(Cust_obj_path)==0:
                 break 
 
+    
+    robot.go_to_pose(initial_pose, relative_to_robot=False).wait_for_completed() 
+    Conclusions()
+    robot.say_text("C'est {} qui à tué {}!".format(agent.get_suspect(), agent.get_victim())).wait_for_completed()
+
+    
+    # for cube in cubes:
+    #     print("*****")
+    #     print(cube)
+    #     if cube.object_id == 3:
+    #         print(cube)
+            #cube = robot.world.get_light_cube(3)
+
+    current_action = robot.pickup_object(cube3, num_retries=5)
+    current_action.wait_for_completed()
+    robot.turn_in_place(degrees(90)).wait_for_completed()
+    robot.drive_straight(distance_mm(500), speed_mmps(300)).wait_for_completed()
+            
 cozmo.run_program(custom_objects, use_3d_viewer=True, use_viewer=True, force_viewer_on_top=True)

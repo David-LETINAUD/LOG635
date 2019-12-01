@@ -1,0 +1,26 @@
+%start S
+
+S[SEM=<MarqueCou(?vp)>] -> VPcou[SEM=?vp]
+S[SEM=<MarqueCouteau(?vp)>] -> VPcouteau[SEM=?vp]
+S[SEM=<MarqueFusil(?vp)>] -> VPfusil[SEM=?vp]
+
+VPcou[SEM=?n] -> N[SEM=?n] V Det Nmarque P Ncou 
+VPcouteau[SEM=?n] ->N[SEM=?n] V Det Nmarque Det Ncouteau 
+VPfusil[SEM=?n] ->N[SEM=?n] V AD Det Nfusil | N[SEM=?n] V AD P Nfusil
+
+N[SEM=?np] -> Nprop[SEM=?np]
+V -> 'a' | 'est'
+Det -> 'des' | 'une' | 'de'
+P -> 'au' | 'par'
+AD -> 'criblé' | 'criblée' | 'morte' | 'mort' | 'atteinte' | 'atteint'
+Nmarque -> 'marques' | 'marque'
+Ncou -> 'cou'
+Ncouteau -> 'couteau'
+Nfusil -> 'balles' | 'balle'
+
+
+Nprop[SEM=<Mustard>] -> 'Mustard'
+Nprop[SEM=<Peacock>] -> 'Peacock'
+Nprop[SEM=<Scarlet>] -> 'Scarlet'
+Nprop[SEM=<Plum>] -> 'Plum'
+Nprop[SEM=<White>] -> 'White'

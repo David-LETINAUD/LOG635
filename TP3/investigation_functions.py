@@ -10,9 +10,9 @@ def handle_object_tapped(evt, **kw):
     #print(evt.obj.object_id)
     # This will be called whenever an EvtObjectMovingStarted event is dispatched -
     # whenever we detect a cube starts moving (via an accelerometer in the cube)
-    if evt.obj.object_id ==2:
-        cube_taps = cube_taps + evt.tap_count if cube_taps<2 else 0
-        print(cube_taps)
+    #if evt.obj.object_id ==2:
+    cube_taps = cube_taps + evt.tap_count if cube_taps<2 else 0
+    print(cube_taps)
 
 agent = CrimeInference()
 

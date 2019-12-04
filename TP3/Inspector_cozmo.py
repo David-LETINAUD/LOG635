@@ -10,7 +10,7 @@ from cozmo.objects import LightCube1Id, LightCube2Id, LightCube3Id
 from cozmo.util import Pose,degrees,distance_mm, speed_mmps
 from avoid_collision import custom_object_pose
 
-from find_the_murderer import *
+from investigation_functions import *
 from Map import create_walls
 
 #FIFO
@@ -72,24 +72,25 @@ def custom_objects(robot: cozmo.robot.Robot):
                     ]
     # Sauvegarde de la position initiale du robot
     # trouver une meilleur position => la position centrale de la map
-    initial_pose = robot.pose
+    #initial_pose = robot.pose
+    initial_pose = Pose(150, 200, 0, angle_z=degrees(180))
 
     # Seul les 4 premiers objets sont détectables
     for cust_cube in path_object: #[0:max_cust_obj]:
         eval(cust_cube)
 
     lookaround = robot.start_behavior(cozmo.behavior.BehaviorTypes.LookAroundInPlace)
-    cubes = robot.world.wait_until_observe_num_objects(num=2, object_type=cozmo.objects.LightCube, timeout=60)
+    cubes = robot.world.wait_until_observe_num_objects(num=1, object_type=cozmo.objects.LightCube, timeout=60)
     lookaround.stop()
 
 
     # Recherche les cubes
     # get cube 1
-    cube1 = robot.world.get_light_cube(LightCube1Id)
+    cube2 = robot.world.get_light_cube(LightCube2Id)
     # get cube 3
     cube3 = robot.world.get_light_cube(LightCube3Id)
 
-    robot.go_to_pose(cube1.pose, relative_to_robot=False).wait_for_completed() 
+    robot.go_to_pose(cube2.pose, relative_to_robot=False).wait_for_completed() 
     #Actions
     Function_path[0](robot)
     Function_path.pop(0)

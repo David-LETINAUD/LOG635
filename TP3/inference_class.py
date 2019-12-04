@@ -21,9 +21,9 @@ def to_fol(fact, grammar):
 class CrimeInference:
 
     def __init__(self):
-        self.weapons = ["Corde", "Fusil", "Couteau"]
-        self.rooms = ["Cuisine", "Bureau", "Garage", "Salon"]
-        self.persons = ["Mustard", "Peacock", "Scarlet", "Plum", "White"]
+        self.weapons = ["Corde", "Fusil", "Couteau", "Poison", "Chandelier", "Feu"]
+        self.rooms = ["Cuisine", "Bureau", "Garage", "Salon","Chambre", "Toilette"]
+        self.persons = ["Mustard", "Peacock", "Scarlet", "Plum", "White","Green"]
         
         # Liste de clauses (faits) qui seront stockées dans la base de connaissance.
         self.clauses = []        

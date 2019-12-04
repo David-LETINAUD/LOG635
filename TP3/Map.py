@@ -26,7 +26,7 @@ def create_walls(robot: cozmo.robot.Robot):
     # wall6 = robot.world.create_custom_fixed_object(wall6, WALL_WIDTH, 60, WALL_HEIGHT,relative_to_robot=False)
     
     # # --- VERTICAL ---
-    wall7 = Pose(40, 110, 0, angle_z=degrees(0))
+    wall7 = Pose(40, 100, 0, angle_z=degrees(0))
     wall7 = robot.world.create_custom_fixed_object(wall7, 80, WALL_WIDTH, WALL_HEIGHT,relative_to_robot=False)
 
     wall12 = Pose(40, 250, 0, angle_z=degrees(0))

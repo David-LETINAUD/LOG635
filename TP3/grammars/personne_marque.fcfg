@@ -17,7 +17,7 @@ Nmarque -> 'marques' | 'marque'
 Ncou -> 'cou'
 Ncouteau -> 'couteau'
 Nfusil -> 'balles' | 'balle'
-
+    
 
 Nprop[SEM=<Mustard>] -> 'Mustard' | 'mustard'
 Nprop[SEM=<Peacock>] -> 'Peacock' | 'peacock'

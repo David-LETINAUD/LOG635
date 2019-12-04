@@ -33,8 +33,8 @@ def handle_object_appeared(evt, **kw):
     if isinstance(evt.obj, CustomObject):
         # Récupération du numéro du CustomTypeXX
         type_nb = int(str(str(evt.obj.object_type).split('.')[1])[-2:])
-        print(type_nb)
-        print(f"Cozmo started seeing a {str(evt.obj.object_type) } " +  str(str(evt.obj.object_type).split('.')[1])[-2:] + " ID " + str(evt.obj.object_id)  )
+        # print(type_nb)
+        # print(f"Cozmo started seeing a {str(evt.obj.object_type) } " +  str(str(evt.obj.object_type).split('.')[1])[-2:] + " ID " + str(evt.obj.object_id)  )
         
         # Si détecté pour la 1ère fois, l'enregistrement dans Obj_detect et Cust_type_detect  
         if type_nb not in Cust_type_detect:
@@ -43,7 +43,7 @@ def handle_object_appeared(evt, **kw):
         # Sinon mise à jour de Obj_detect (permet de mettre à jour l'objet et nottament sa position)
         else :
             ind = Cust_type_detect.index(type_nb)
-            print("Position mise à jour")
+            # print("Position mise à jour")
             # actualiser la position
             Obj_detect[ind] = evt.obj
 

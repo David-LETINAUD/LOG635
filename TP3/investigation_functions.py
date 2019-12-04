@@ -4,15 +4,15 @@ from cozmo.util import degrees,Pose
 from inference_class import *
 
 cube_taps = 0
-
+#cube1 = robot.world.get_light_cube(LightCube1Id)
 def handle_object_tapped(evt, **kw):
     global cube_taps 
     #print(evt.obj.object_id)
     # This will be called whenever an EvtObjectMovingStarted event is dispatched -
     # whenever we detect a cube starts moving (via an accelerometer in the cube)
-    #if evt.obj.object_id ==2:
-    cube_taps = cube_taps + evt.tap_count if cube_taps<2 else 0
-    print(cube_taps)
+    if evt.obj.cube_id == cozmo.objects.LightCube1Id:
+        cube_taps = cube_taps + evt.tap_count if cube_taps<2 else 0
+        print(cube_taps)
 
 agent = CrimeInference()
 

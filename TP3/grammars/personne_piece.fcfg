@@ -10,12 +10,12 @@ PP[SEM=?vp] -> Prep Det N[SEM = ?vp]
 Prep -> 'dans' | 'à'
 Det -> 'le' | 'la'
 
-Npiece[SEM=<Cuisine>] -> 'Cuisine' | 'cuisine'
-Npiece[SEM=<Salon>] -> 'Salon' | 'salon'
-Npiece[SEM=<Bureau>] -> 'Bureau' | 'bureau'
-Npiece[SEM=<Garage>] -> 'Garage' | 'garage'
-Npiece[SEM=<Toilette>] -> 'Toilette' | 'toilette' | 'Toilettes' | 'toilettes'
-Npiece[SEM=<Chambre>] -> 'Chambre' | 'chambre'
+N[SEM=<Cuisine>] -> 'Cuisine' | 'cuisine'
+N[SEM=<Salon>] -> 'Salon' | 'salon'
+N[SEM=<Bureau>] -> 'Bureau' | 'bureau'
+N[SEM=<Garage>] -> 'Garage' | 'garage'
+N[SEM=<Toilette>] -> 'Toilette' | 'toilette' | 'Toilettes' | 'toilettes'
+N[SEM=<Chambre>] -> 'Chambre' | 'chambre'
 
 Nprop[SEM=<Mustard>] -> 'Mustard' | 'mustard'
 Nprop[SEM=<Peacock>] -> 'Peacock' | 'peacock'

@@ -24,6 +24,19 @@ Obj_detect = []
 # stock les numéros des CustomTypeXX des objets détéctés
 Cust_type_detect = []
 
+# async def roll_a_cube(robot: cozmo.robot.Robot):
+#     await robot.set_head_angle(degrees(-5.0)).wait_for_completed()
+
+#     print("Cozmo is waiting until he sees a cube")
+#     cube = await robot.world.wait_for_observed_light_cube()
+
+#     print("Cozmo found a cube, and will now attempt to roll with it:")
+#     # Cozmo will approach the cube he has seen and roll it
+#     # check_for_object_on_top=True enforces that Cozmo will not roll cubes with anything on top
+#     action = robot.roll_cube(cube, check_for_object_on_top=True, num_retries=2)
+#     await action.wait_for_completed()
+#     print("result:", action.result)
+
 def handle_object_appeared(evt, **kw):   
     global Cust_type_detect
     global Obj_detect
@@ -90,8 +103,13 @@ def custom_objects(robot: cozmo.robot.Robot):
     # get cube 3
     cube3 = robot.world.get_light_cube(LightCube3Id)
 
+    #robot.go_to_object(cube2, distance_mm(50)).wait_for_completed()
+    print("######################################")
+    print(cube2.pose)
+    print("######################################")
     robot.go_to_pose(cube2.pose, relative_to_robot=False).wait_for_completed() 
-    robot.roll_cube(cube2).wait_for_completed()
+    #robot.roll_cube(cube2, check_for_object_on_top=False, num_retries=2).wait_for_completed()
+    #roll_a_cube(robot)
     #Actions
     Function_path[0](robot)
     Function_path.pop(0)

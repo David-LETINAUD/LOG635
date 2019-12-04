@@ -103,12 +103,10 @@ def custom_objects(robot: cozmo.robot.Robot):
     # get cube 3
     cube3 = robot.world.get_light_cube(LightCube3Id)
 
-    #robot.go_to_object(cube2, distance_mm(50)).wait_for_completed()
-    print("######################################")
-    print(cube2.pose)
-    print("######################################")
-    robot.go_to_pose(cube2.pose, relative_to_robot=False).wait_for_completed() 
-    #robot.roll_cube(cube2, check_for_object_on_top=False, num_retries=2).wait_for_completed()
+    robot.go_to_object(cube2, distance_mm(100)).wait_for_completed()
+    #robot.go_to_pose(cube2.pose, relative_to_robot=False).wait_for_completed() 
+    robot.roll_cube(cube2, check_for_object_on_top=False, num_retries=2).wait_for_completed()
+    #, approach_angle = 0
     #roll_a_cube(robot)
     #Actions
     Function_path[0](robot)
@@ -161,9 +159,18 @@ def custom_objects(robot: cozmo.robot.Robot):
     Conclusions()
     robot.say_text("C'est {} qui à tué {}!".format(agent.get_suspect(), agent.get_victim())).wait_for_completed()
 
-    current_action = robot.pickup_object(cube3, num_retries=5)
-    current_action.wait_for_completed()
+ 
+    robot.set_lift_height(1.0).wait_for_completed()
+    robot.go_to_object(cube3, distance_mm(35)).wait_for_completed()
+    robot.play_anim_trigger(cozmo.anim.Triggers.OnSpeedtapTap).wait_for_completed()
+    
+    robot.drive_straight(distance_mm(-100), speed_mmps(100)).wait_for_completed()
+    robot.set_lift_height(0.0).wait_for_completed()
+    robot.pickup_object(cube3, num_retries=5).wait_for_completed()
+
     robot.turn_in_place(degrees(90)).wait_for_completed()
     robot.drive_straight(distance_mm(500), speed_mmps(300)).wait_for_completed()
-            
+
+
+print("******************************")       
 cozmo.run_program(custom_objects, use_3d_viewer=True, use_viewer=True, force_viewer_on_top=True)

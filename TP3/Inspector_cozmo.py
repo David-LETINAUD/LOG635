@@ -91,6 +91,7 @@ def custom_objects(robot: cozmo.robot.Robot):
     cube3 = robot.world.get_light_cube(LightCube3Id)
 
     robot.go_to_pose(cube2.pose, relative_to_robot=False).wait_for_completed() 
+    robot.roll_cube(cube2).wait_for_completed()
     #Actions
     Function_path[0](robot)
     Function_path.pop(0)
@@ -142,8 +143,6 @@ def custom_objects(robot: cozmo.robot.Robot):
     Conclusions()
     robot.say_text("C'est {} qui à tué {}!".format(agent.get_suspect(), agent.get_victim())).wait_for_completed()
 
-    current_action = robot.roll_cube(cube3)
-    current_action.wait_for_completed()
     current_action = robot.pickup_object(cube3, num_retries=5)
     current_action.wait_for_completed()
     robot.turn_in_place(degrees(90)).wait_for_completed()

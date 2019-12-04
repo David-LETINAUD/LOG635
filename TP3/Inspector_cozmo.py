@@ -142,6 +142,8 @@ def custom_objects(robot: cozmo.robot.Robot):
     Conclusions()
     robot.say_text("C'est {} qui à tué {}!".format(agent.get_suspect(), agent.get_victim())).wait_for_completed()
 
+    current_action = robot.roll_cube(cube3)
+    current_action.wait_for_completed()
     current_action = robot.pickup_object(cube3, num_retries=5)
     current_action.wait_for_completed()
     robot.turn_in_place(degrees(90)).wait_for_completed()

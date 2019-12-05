@@ -24,19 +24,6 @@ Obj_detect = []
 # stock les numéros des CustomTypeXX des objets détéctés
 Cust_type_detect = []
 
-# async def roll_a_cube(robot: cozmo.robot.Robot):
-#     await robot.set_head_angle(degrees(-5.0)).wait_for_completed()
-
-#     print("Cozmo is waiting until he sees a cube")
-#     cube = await robot.world.wait_for_observed_light_cube()
-
-#     print("Cozmo found a cube, and will now attempt to roll with it:")
-#     # Cozmo will approach the cube he has seen and roll it
-#     # check_for_object_on_top=True enforces that Cozmo will not roll cubes with anything on top
-#     action = robot.roll_cube(cube, check_for_object_on_top=True, num_retries=2)
-#     await action.wait_for_completed()
-#     print("result:", action.result)
-
 def handle_object_appeared(evt, **kw):   
     global Cust_type_detect
     global Obj_detect
@@ -71,7 +58,7 @@ def custom_objects(robot: cozmo.robot.Robot):
     # ..vois ou arrète de voir un objet    
     robot.add_event_handler(cozmo.objects.EvtObjectAppeared, handle_object_appeared)
     robot.add_event_handler(cozmo.objects.EvtObjectDisappeared, handle_object_disappeared)
-    # Cube2 taped
+    # Cube1 taped
     robot.add_event_handler(cozmo.objects.EvtObjectTapped, handle_object_tapped)
 
     create_walls(robot)
@@ -79,11 +66,12 @@ def custom_objects(robot: cozmo.robot.Robot):
     global Cust_type_detect
     global Obj_detect
 
+    # Objets représentant des armes
     path_object = ['robot.world.define_custom_cube(CustomObjectTypes.CustomType04,CustomObjectMarkers.Diamonds2,60, 24.19, 24.19, True)',
                    'robot.world.define_custom_cube(CustomObjectTypes.CustomType05,CustomObjectMarkers.Diamonds3,60, 24.19, 24.19, True)',
                    'robot.world.define_custom_cube(CustomObjectTypes.CustomType06,CustomObjectMarkers.Diamonds4,60, 24.19, 24.19, True)'
                     ]
-    # Sauvegarde de la position initiale du robot
+                    
     # trouver une meilleur position => la position centrale de la map
     #initial_pose = robot.pose
     initial_pose = Pose(150, 200, 0, angle_z=degrees(180))
@@ -92,23 +80,22 @@ def custom_objects(robot: cozmo.robot.Robot):
     for cust_cube in path_object: #[0:max_cust_obj]:
         eval(cust_cube)
 
+    # Détection du cube2 correspondant à la victime
     lookaround = robot.start_behavior(cozmo.behavior.BehaviorTypes.LookAroundInPlace)
     cubes = robot.world.wait_until_observe_num_objects(num=1, object_type=cozmo.objects.LightCube, timeout=60)
     lookaround.stop()
 
 
     # Recherche les cubes
-    # get cube 1
+    # get cube 2
     cube2 = robot.world.get_light_cube(LightCube2Id)
     # get cube 3
     cube3 = robot.world.get_light_cube(LightCube3Id)
 
+    # Analyse du corps
     robot.go_to_object(cube2, distance_mm(100)).wait_for_completed()
-    #robot.go_to_pose(cube2.pose, relative_to_robot=False).wait_for_completed() 
     robot.roll_cube(cube2, check_for_object_on_top=False, num_retries=2).wait_for_completed()
-    #, approach_angle = 0
-    #roll_a_cube(robot)
-    #Actions
+    #Actions : Analyse de la victime
     Function_path[0](robot)
     Function_path.pop(0)
    
@@ -117,9 +104,7 @@ def custom_objects(robot: cozmo.robot.Robot):
     # Faire toutes les autres actions associés aux marqueurs
     while len(Cust_obj_path)!=0 :
 
-        # Faire tourner le robot pour mieux détecter les prochains objets
-        #robot.turn_in_place(degrees(-17*Cust_obj_path[0])).wait_for_completed()
-
+        # Recherche des armes potentielles
         lookaround = robot.start_behavior(cozmo.behavior.BehaviorTypes.LookAroundInPlace)
         robot.world.wait_until_observe_num_objects(num=1, object_type=CustomObject, timeout=10)
         lookaround.stop()
@@ -154,20 +139,22 @@ def custom_objects(robot: cozmo.robot.Robot):
             if len(Cust_obj_path)==0:
                 break 
 
-    
+    # Retour à la position centrale et faire les conclusions
     robot.go_to_pose(initial_pose, relative_to_robot=False).wait_for_completed() 
     Conclusions()
     robot.say_text("C'est {} qui à tué {}!".format(agent.get_suspect(), agent.get_victim())).wait_for_completed()
 
- 
+    # Assommer le meurtrier  
     robot.set_lift_height(1.0).wait_for_completed()
     robot.go_to_object(cube3, distance_mm(35)).wait_for_completed()
     robot.play_anim_trigger(cozmo.anim.Triggers.OnSpeedtapTap).wait_for_completed()
     
+    # Soulever le meurtrier
     robot.drive_straight(distance_mm(-100), speed_mmps(100)).wait_for_completed()
     robot.set_lift_height(0.0).wait_for_completed()
     robot.pickup_object(cube3, num_retries=5).wait_for_completed()
 
+    # Ammener le meurtrier à la prison
     robot.turn_in_place(degrees(90)).wait_for_completed()
     robot.drive_straight(distance_mm(500), speed_mmps(300)).wait_for_completed()
 

@@ -5,6 +5,7 @@ import time
 WALL_HEIGHT = 50
 WALL_WIDTH = 10
 
+# Création des murs
 def create_walls(robot: cozmo.robot.Robot):
     # --- HORIZONTAL ---
     wall1 = Pose(380, 250, 0, angle_z=degrees(0))
